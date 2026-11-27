@@ -57,3 +57,19 @@ M5=$(ffmpeg -hide_banner -i "$NAR" -af "$PRE,loudnorm=I=-14:TP=-1.5:LRA=11:print
 z(){ echo "$M5" | python3 -c "import json,sys;print(json.load(sys.stdin)['$1'])"; }
 LN5="loudnorm=I=-14:TP=-1.5:LRA=11:measured_I=$(z input_i):measured_TP=$(z input_tp):measured_LRA=$(z input_lra):measured_thresh=$(z input_thresh):offset=$(z target_offset):linear=true"
 STORY=v4 python3 -I "$R/tools/claude_style.py" "$FD" - | ffmpeg -v error -y -f rawvideo -pix_fmt rgb24 -s 1080x1920 -r 30 -i - -i "$NAR" -map 0:v -map 1:a -af "$PRE,$LN5,alimiter=limit=0.8,apad" -c:v libx264 -preset slow -crf 24 -pix_fmt yuv420p -tune animation -c:a aac -b:a 128k -ar 44100 -movflags +faststart -t 47.3 "$R/output/BB_Labios_Surco_Narracion.mp4"
+
+# ---- Narração sem pausas longas + voz realçada + trilha suave original ----
+AW="$(mktemp -d)"
+ffmpeg -v error -y -i "$R/assets/narracion_labios_surco.m4a" -ac 1 -ar 44100 "$AW/nar.wav"
+python3 -I "$R/tools/tighten_audio.py" "$AW/nar.wav" "$AW/tight.wav" "$AW/map.json" >/dev/null
+VCH="highpass=f=80,afftdn=nf=-45,equalizer=f=250:t=q:w=1:g=-2,equalizer=f=3200:t=q:w=1.2:g=3.5,equalizer=f=9000:t=h:w=1:g=1.5,acompressor=threshold=-22dB:ratio=3:attack=8:release=180:makeup=2"
+M6=$(ffmpeg -hide_banner -i "$AW/tight.wav" -af "$VCH,loudnorm=I=-14:TP=-1.5:LRA=9:print_format=json" -f null - 2>&1 | sed -n '/^{/,/^}/p')
+y6(){ echo "$M6" | python3 -c "import json,sys;print(json.load(sys.stdin)['$1'])"; }
+ffmpeg -v error -y -i "$AW/tight.wav" -af "$VCH,loudnorm=I=-14:TP=-1.5:LRA=9:measured_I=$(y6 input_i):measured_TP=$(y6 input_tp):measured_LRA=$(y6 input_lra):measured_thresh=$(y6 input_thresh):offset=$(y6 target_offset):linear=true" -ar 44100 -ac 2 "$AW/voice.wav"
+DUR6=$(DUR_ONLY=1 STORY=v4 TIMEMAP="$AW/map.json" python3 -I "$R/tools/claude_style.py" "$FD" -)
+python3 -I "$R/tools/make_music.py" "$DUR6" "$AW/music.wav" >/dev/null
+# música bem baixinha (~-31 LUFS) e abaixando quando há voz
+ffmpeg -v error -y -i "$AW/voice.wav" -i "$AW/music.wav" -filter_complex "[1:a]volume=-19dB[m];[0:a]apad,asplit=2[v][sc];[m][sc]sidechaincompress=threshold=0.02:ratio=4:attack=30:release=600[md];[v][md]amix=inputs=2:duration=longest:normalize=0,alimiter=limit=0.89" -t "$DUR6" "$AW/mix.wav"
+STORY=v4 TIMEMAP="$AW/map.json" python3 -I "$R/tools/claude_style.py" "$FD" - 2>/dev/null | ffmpeg -v error -y -f rawvideo -pix_fmt rgb24 -s 1080x1920 -r 30 -i - -i "$AW/mix.wav" -map 0:v -map 1:a -c:v libx264 -preset slow -crf 24 -pix_fmt yuv420p -tune animation -c:a aac -b:a 160k -movflags +faststart -t "$DUR6" "$R/output/BB_Labios_Surco_Narracion_Musica.mp4"
+
+rm -rf "$AW"

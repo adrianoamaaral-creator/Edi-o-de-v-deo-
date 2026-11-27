@@ -200,6 +200,27 @@ if os.environ.get("STORY") == "v4":
      dict(t0=37.0, t1=40.9, th=LIGHT, title="Sin agujas.", sub="Todo este resultado, sin agujas.", icon=icon_syringe),
      dict(t0=40.9, t1=DUR, th=LIGHT, end=True),
     ]
+if os.environ.get("STORY") == "v4" and os.environ.get("TIMEMAP"):
+    # narração com pausas encurtadas: converte os tempos originais para a nova linha do tempo
+    import json
+    _MAP = json.load(open(os.environ["TIMEMAP"]))
+    def remap(t):
+        prev_end = 0.0
+        for k0, k1, nt in _MAP:
+            if t < k0: return prev_end if prev_end else max(nt - (k0 - t), 0.0)
+            if t <= k1: return nt + (t - k0)
+            prev_end = nt + (k1 - k0)
+        return prev_end + (t - _MAP[-1][1])
+    _speech_end = remap(46.7)
+    for sl in slides:
+        if sl.get("ba"):
+            b0 = sl["t0"]; nb0 = remap(b0)
+            for key in ("d_start", "lips_ring", "lips_ring_end", "fold_rings"):
+                if sl.get(key) is not None: sl[key] = remap(b0 + sl[key]) - nb0
+            sl["phases"] = [(remap(b0 + t) - nb0 if t else 0.0, ti, su) for t, ti, su in sl["phases"]]
+        sl["t0"] = remap(sl["t0"]) if sl["t0"] else 0.0
+    for a_, b_ in zip(slides, slides[1:]): a_["t1"] = b_["t0"]
+    DUR = round(max(_speech_end + 2.0, slides[-1]["t0"] + 5.0), 2); slides[-1]["t1"] = DUR
 if os.environ.get("STORY") == "v3":
     # Versão SEM VOZ para regravar o áudio: lábios + surco nasogeniano da mesma cliente (24 s)
     DUR = 24.0
@@ -385,6 +406,7 @@ def bars(fr, t, th):
         if p > 0: d.rounded_rectangle((x, y, x + max(segw * p, 6), y + 6), radius=3, fill=th["accent"] + (255,))
     fr.alpha_composite(ov)
 
+if os.environ.get("DUR_ONLY"): print(DUR); sys.exit(0)
 for i, s in enumerate(slides): build(s, i)
 XF = 0.35; out = sys.stdout.buffer
 prev = [float(x) for x in os.environ.get("PREV_TS", "1.5,4.5,8,12,15,19,23.5").split(",")] if PREVIEW else None
