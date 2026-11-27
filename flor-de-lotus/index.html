@@ -80,6 +80,14 @@ h2{font-family:"Cormorant Garamond",serif;font-weight:600;font-size:1.6rem;
 .special p{color:var(--muted);font-size:.9rem;margin-bottom:16px}
 .special .btn{margin:0}
 
+.hours{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:20px 18px;
+  text-align:center;margin-top:6px;box-shadow:var(--shadow)}
+.hours h3{font-size:.75rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);font-weight:600;margin-bottom:8px}
+.hours .when{font-size:1.02rem}
+.hours .when small{color:var(--muted);font-size:.8rem}
+.hours .note{color:var(--muted);font-size:.86rem;margin:12px 0 12px;font-style:italic}
+.hours .link{color:var(--rose);text-decoration:none;font-weight:600;font-size:.9rem}
+.hours .link:hover{text-decoration:underline}
 footer{text-align:center;color:var(--muted);font-size:.78rem;margin-top:36px}
 footer .social{display:flex;justify-content:center;gap:12px;margin-bottom:12px}
 footer .social a{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;
@@ -105,7 +113,7 @@ footer .social svg{width:20px;height:20px}
 
   <a class="btn" id="catalogo" href="#" target="_blank" rel="noopener">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 5a2 2 0 0 1 2-2h12v18H6a2 2 0 0 1-2-2z"/><path d="M8 7h6M8 11h6"/></svg>
-    <span>Nosso catálogo<small>Veja os modelos no catálogo do WhatsApp</small></span>
+    <span>Nosso catálogo<small>Veja nossos modelos no WhatsApp</small></span>
     <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg>
   </a>
 
@@ -120,6 +128,14 @@ footer .social svg{width:20px;height:20px}
     <span>Ligar para a loja<small id="telefoneTxt">Telefone</small></span>
     <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg>
   </a>
+
+
+  <div class="hours">
+    <h3>Horário de atendimento</h3>
+    <p class="when"><strong>Segunda a sexta</strong> · 13h30 às 17h30<br><small>(exceto feriados)</small></p>
+    <p class="note">Precisa de outro horário? Será um prazer receber você com hora marcada: fora desse período, atendemos sempre com agendamento, com toda a atenção que o seu momento merece.</p>
+    <a class="link" data-wa="Olá! Gostaria de agendar um atendimento fora do horário." href="#">Agendar meu horário →</a>
+  </div>
 
   <div class="divider">✦</div>
   <h2>Trabalhamos com</h2>
@@ -163,7 +179,7 @@ footer .social svg{width:20px;height:20px}
       </a>
     </div>
     <p class="ig">@flordelotusvestidos</p>
-    <p id="horario">Seg a Sex 9h–18h · Sáb 9h–13h</p>
+    <p id="horario"></p>
     <p>© <span id="ano"></span> Flor de Lótus</p>
   </footer>
 </div>
@@ -179,7 +195,7 @@ const LOJA = {
   mapa:      "https://maps.app.goo.gl/Z8nqTx3n5kTgxA7C6",
   catalogo:  "https://wa.me/c/556192551874",
   instagram: "https://instagram.com/flordelotusvestidos",
-  horario:   ""                            // ex.: "Seg a Sex 9h–18h · Sáb 9h–13h" (vazio = escondido)
+  horario:   ""                            // já aparece no quadro "Horário de atendimento"
 };
 
 const wa = msg => "https://wa.me/" + LOJA.whatsapp + "?text=" + encodeURIComponent(msg);
