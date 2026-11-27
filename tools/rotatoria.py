@@ -31,8 +31,8 @@ def prog(t, a, b): return clamp((t - a) / (b - a)) if b > a else float(t >= a)
 rng = np.random.default_rng(7)
 
 # ---------------------------------------------------------------- mapa
-MAP_Y0, MAP_H = 420, 1080           # faixa do mapa na tela
-CX, CY = 540, 500                   # centro da rotatória (coord. do mapa)
+MAP_Y0, MAP_H = 0, 1920           # faixa do mapa na tela
+CX, CY = 540, 840                   # centro da rotatória (coord. do mapa)
 R_ISLAND, R_IN, R_DIV, R_OUT, R_EDGE = 135, 185, 237, 289, 340
 ROAD_HALF = 120                     # vias de acesso: 240 px
 LANE = 60                           # centro da faixa da direita a partir do eixo
@@ -365,12 +365,12 @@ def zoom_for(t):
 
 def top_card(c):
     d = ImageDraw.Draw(c)
-    d.rectangle([40, 250, 1040, 386], fill=CARD); d.rectangle([40, 382, 1040, 386], fill=(210, 196, 166))
-    f = F(SB, 44); t = "ROTATÓRIA · QUEM PASSA PRIMEIRO?"; d.text(((W - d.textlength(t, font=f)) / 2, 266), t, font=f, fill=INK)
+    d.rectangle([40, 200, 1040, 336], fill=CARD); d.rectangle([40, 332, 1040, 336], fill=(210, 196, 166))
+    f = F(SB, 44); t = "ROTATÓRIA · QUEM PASSA PRIMEIRO?"; d.text(((W - d.textlength(t, font=f)) / 2, 216), t, font=f, fill=INK)
     fs = F(SB, 28)
     for x0, txt, col in [(300, "já está dentro", GREEN), (580, "vai entrar", (226, 168, 0))]:
         w = d.textlength(txt, font=fs) + 44
-        d.rounded_rectangle([x0, 328, x0 + w, 370], 20, fill=col); d.text((x0 + 22, 332), txt, font=fs, fill=WHITE)
+        d.rounded_rectangle([x0, 278, x0 + w, 320], 20, fill=col); d.text((x0 + 22, 282), txt, font=fs, fill=WHITE)
 
 HANDLE = "@INSTRUTORGUSTAVOVIEIRA"
 
@@ -380,9 +380,9 @@ def overlay_tags(c, t):
     if t < T_PREF:
         a1 = pop(t, 0.08, 0.25); a2 = pop(t, 1.04, 0.25)
         fade = 1 - prog(t, T_PREF - 0.25, T_PREF)
-        paste_scaled(c, tag("Na rotatória,", 76, WHITE, INK, 2), (540, 520), a1, fade)
-        paste_scaled(c, tag("quem passa primeiro?", 84, NAVY, WHITE, -2, hi="passa", hi_color=(255, 196, 0)), (540, 640), a2, fade)
-    def lower(text, t0, t1, bg, fg=WHITE, rot=-2, y=1565, size=64, **kw):
+        paste_scaled(c, tag("Na rotatória,", 76, WHITE, INK, 2), (540, 450), a1, fade)
+        paste_scaled(c, tag("quem passa primeiro?", 84, NAVY, WHITE, -2, hi="passa", hi_color=(255, 196, 0)), (540, 570), a2, fade)
+    def lower(text, t0, t1, bg, fg=WHITE, rot=-2, y=1440, size=64, **kw):
         if t0 <= t < t1 + 0.2:
             a, dy = slide_in(t, t0, t1)
             paste_scaled(c, tag(text, size, bg, fg, rot, **kw), (540, y + dy), 1, a)
@@ -395,13 +395,13 @@ def overlay_tags(c, t):
     lower("olha à esquerda e entra quando estiver livre", T_OLHA, T_YIELD - 0.1, NAVY, size=48)
     lower("DÊ A PREFERÊNCIA: reduz", T_YIELD, T_DEIXA, RED, size=58)
     lower("e deixa passar quem já está dentro", T_DEIXA, T_ENTROU, GREEN, rot=2, size=54)
-    lower("entrou?", T_ENTROU, T_DIR, NAVY, y=1560)
-    lower("faixa da DIREITA: sai logo", T_DIR, T_RESUMO - 6.0, (226, 168, 0), INK, y=1560, size=58)
-    lower("faixa da ESQUERDA: volta maior", T_ESQ, T_SAIR, NAVY, rot=2, y=1650, size=58)
+    lower("entrou?", T_ENTROU, T_DIR, NAVY, y=1420)
+    lower("faixa da DIREITA: sai logo", T_DIR, T_RESUMO - 6.0, (226, 168, 0), INK, y=1420, size=58)
+    lower("faixa da ESQUERDA: volta maior", T_ESQ, T_SAIR, NAVY, rot=2, y=1515, size=58)
     lower("seta para a direita antes de sair", T_SAIR, T_INFRA, (226, 168, 0), INK, size=56)
     lower("sem seta = infração", T_INFRA, T_RESUMO, RED, rot=2, size=72)
     # carimbos
-    for key, t0, t1, pos in [("ESPERA", T_ESPERA, T_ATENCAO, (290, 1150)), ("SETA!", T_SETA, T_INFRA, (300, 650))]:
+    for key, t0, t1, pos in [("ESPERA", T_ESPERA, T_ATENCAO, (250, 1250)), ("SETA!", T_SETA, T_INFRA, (270, 420))]:
         if t0 <= t < t1:
             sc, sh = stamp(t, t0); fade = 1 - prog(t, t1 - 0.2, t1)
             off = (sh if int(t * 30) % 2 else -sh)
@@ -450,7 +450,7 @@ def frame(t):
     overlay_tags(c, t)
     summary_card(c, t)
     d = ImageDraw.Draw(c); f = F(SB, 26)
-    d.text((40, MAP_Y0 + MAP_H - 50), HANDLE, font=f, fill=(245, 245, 235))
+    d.text(((W - d.textlength(HANDLE, font=f)) / 2, 350), HANDLE, font=f, fill=(245, 245, 235))
     return c.convert("RGB")
 
 def main():
