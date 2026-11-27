@@ -130,15 +130,15 @@ N=len(slides)
 def build(s):
     th=s["th"]; s["bg"]=gradient(*th["bg"]); s["hdr"]=header(th); L=[]
     if s.get("end"):
-        lot=ico_lotus(th["rose"]).resize((420,420),Image.LANCZOS); L.append(("icon",lot,((W-420)//2,300),0.0))
-        L.append(("txt",*text_layer("BBLips",font(SERIF,110,400),th["ink"],740),0.25))
-        im=Image.new("RGBA",(W,H),(0,0,0,0)); d=ImageDraw.Draw(im); f=font(SANS,28,600); t="ESTÉTICA AVANZADA"; w=spaced_w(d,t,f,10)
-        spaced(d,(W-w)/2,900,t,f,th["rose"]+(255,),10); d.line((W/2-160,880,W/2+160,880),fill=th["rose"]+(120,),width=2); bb=im.getbbox(); L.append(("txt",im.crop(bb),bb[:2],0.4))
-        L.append(("txt",*text_layer("Bruna Borges",font(SERIFI,64,400),th["ink"],990),0.55))
-        L.append(("txt",*text_layer("Especialista en labios",font(SANS,34,400),th["soft"],1095),0.65))
+        import os
+        m=Image.open(os.environ["LOGO"]).getchannel("A"); lw=560; m=m.resize((lw,int(m.height*lw/m.width)),Image.LANCZOS)
+        logo=Image.new("RGBA",m.size,th["ink"]+(255,)); logo.putalpha(m)
+        L.append(("icon",logo,((W-lw)//2,300),0.0))
+        L.append(("txt",*text_layer("Bruna Borges",font(SERIFI,64,400),th["rose"],930),0.45))
+        L.append(("txt",*text_layer("Estética avanzada · Especialista en labios",font(SANS,34,400),th["soft"],1035),0.65))
         im=Image.new("RGBA",(W,H),(0,0,0,0)); d=ImageDraw.Draw(im)
-        d.rounded_rectangle((W/2-250,1230,W/2+250,1336),radius=53,fill=(232,186,192,255)); d.text((W/2,1283),"Reserva tu cita",font=font(SANS,42,600),fill=(52,38,50,255),anchor="mm")
-        d.text((W/2,1410),"@brunaborgesestetic",font=font(SANS,36,500),fill=th["soft"]+(255,),anchor="mm"); bb=im.getbbox(); L.append(("txt",im.crop(bb),bb[:2],0.85))
+        d.rounded_rectangle((W/2-250,1160,W/2+250,1266),radius=53,fill=(232,186,192,255)); d.text((W/2,1213),"Reserva tu cita",font=font(SANS,42,600),fill=(52,38,50,255),anchor="mm")
+        d.text((W/2,1340),"@brunaborgesestetic",font=font(SANS,36,500),fill=th["soft"]+(255,),anchor="mm"); bb=im.getbbox(); L.append(("txt",im.crop(bb),bb[:2],0.85))
     else:
         y=330; tf=TS if max(len(l) for l in s["title"].split("\n"))<=14 else TSs
         L.append(("txt",*text_layer(s["title"],tf,th["ink"],y),0.0))
@@ -174,7 +174,7 @@ def bars(fr,t,th):
     fr.alpha_composite(ov)
 XF=0.4
 out=sys.stdout.buffer
-nfr=int(round(DUR*FPS)); prev_ts=[0.5,3,9,15,19,24,28,32,37] if PREVIEW else None
+nfr=int(round(DUR*FPS)); prev_ts=[0.5,3,9,15,19,24,28,32,37.5] if PREVIEW else None
 for n in range(nfr):
     t=n/FPS
     if PREVIEW and not any(abs(t-pt)<0.5/FPS for pt in prev_ts): continue

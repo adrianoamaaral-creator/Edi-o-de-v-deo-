@@ -43,11 +43,18 @@ card([("HYALURON PEN",font(MS,46,800),WHITE),("Volumen en labios · sin agujas",
 card([("Más sutil  ·  Más natural",font(PFI,40,600),INK)],"benefit",bg=CREAM)
 card([("Reserva tu cita",font(PFI,46,600),WHITE),("Escríbenos por DM  ·  @brunaborgesestetic",font(MS,20,600),INK)],"cta")
 
-# end card text
-im=canvas(); d=ImageDraw.Draw(im)
-d.line((W/2-120,905,W/2+120,905),fill=GOLD,width=2)
-f=font(MS,22,600); t="ESTÉTICA AVANZADA"; w=spaced_w(d,t,f,6); spaced(d,((W-w)/2,930),t,f,(240,226,220,255),6)
-d.text((W/2,1000),"Bruna Borges",font=font(PFI,48,500),fill=(232,170,178,255),anchor="mm")
-d.rounded_rectangle((W/2-190,1060,W/2+190,1130),radius=35,fill=(232,170,178,255))
-d.text((W/2,1095),"Reserva tu cita",font=font(MS,28,700),fill=INK,anchor="mm")
+# end card: cartela completa com o logo oficial (cobre a cartela original)
+import os
+from PIL import ImageFilter
+g=Image.new("RGB",(1,H))
+for y in range(H):
+    k=y/(H-1); g.putpixel((0,y),tuple(int(a+(b-a)*k) for a,b in zip((60,44,58),(36,27,36))))
+im=g.resize((W,H)).convert("RGBA"); d=ImageDraw.Draw(im)
+m=Image.open(os.environ["LOGO"]).getchannel("A"); lw=380; m=m.resize((lw,int(m.height*lw/m.width)),Image.LANCZOS)
+logo=Image.new("RGBA",m.size,(246,232,228,255)); logo.putalpha(m); im.alpha_composite(logo,((W-lw)//2,250))
+d.text((W/2,690),"Bruna Borges",font=font(PFI,46,500),fill=(232,186,192,255),anchor="mm")
+d.text((W/2,748),"Estética avanzada · Especialista en labios",font=font(MS,22,500),fill=(214,190,196,255),anchor="mm")
+d.rounded_rectangle((W/2-180,815,W/2+180,887),radius=36,fill=(232,186,192,255))
+d.text((W/2,851),"Reserva tu cita",font=font(MS,28,700),fill=INK,anchor="mm")
+d.text((W/2,940),"@brunaborgesestetic",font=font(MS,25,500),fill=(214,190,196,255),anchor="mm")
 im.save(OUT+"/end.png")
