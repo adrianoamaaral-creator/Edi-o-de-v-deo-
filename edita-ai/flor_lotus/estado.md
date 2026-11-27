@@ -7,7 +7,7 @@ Cores: fundo #0E0C0D · texto #FFFFFF · destaque #D48C8C (rosa do logo) · faix
 Fontes: título Playfair Display 700 (itálico na palavra-chave) · texto Montserrat 500
 Usa: ___ | Nunca: ___
 Chamada final: "Visite nossa loja" · Seg a Sex, 13h30 às 17h30 · @flordelotusvestidos
-Estilo aprovado: legenda Elegante · gancho Manchete · visual Dourado · empiriquitação média · zoom nos cortes
+Estilo aprovado: legenda Elegante · gancho Manchete · visual Dourado (fios e destaque no rosa do logo) · empiriquitação média · zoom nos cortes · animado sem rosto aprovado (ajustes)
 
 ## Objetivo
 Alugar mais. Instagram + TikTok, posta quase todo dia. Aparece às vezes nos vídeos.
@@ -20,4 +20,4 @@ Vídeos IMG_6483.MOV e IMG_7173.MOV (~70 MB) não baixam pelo Drive: pedir pelo 
 
 ## Vídeo "Como funcionam os ajustes" (animado, sem aparecer)
 Roteiro aprovado. Ajuste incluso no aluguel. Prova até 15 dias antes da retirada.
-Amostra 0–10 s enviada (output/flor_lotus/Ajustes_Amostra.mp4) — aguardando aprovação.
+Amostra aprovada. Vídeo final: output/flor_lotus/Flor_de_Lotus_Ajustes_FINAL.mp4 (28,5 s, só efeitos sonoros — música a colocar no app).
