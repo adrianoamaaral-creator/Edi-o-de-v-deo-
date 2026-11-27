@@ -41,11 +41,14 @@ WALL = ["11985", "12042", "11752", "11054", "11690", "11810", "11672", "11866", 
 # ---------- linha do tempo (em batidas) ----------
 scenes = []
 def add(kind, beats, **kw): scenes.append(dict(kind=kind, beats=beats, **kw))
-add("intro", 6)
+# LOCUCAO=1: cenas mais longas para caber a narração (roteiro em output/ROTEIRO_Semijoias_Locucao.md)
+LOC = bool(os.environ.get("LOCUCAO"))
+BI, BT, BP, BO = (8, 4, 5, 10) if LOC else (6, 3, 3, 8)
+add("intro", BI)
 for ti, T in enumerate(TIERS):
-    add("tier", 3, tier=ti, trans="wipe")
-    for k, it in enumerate(T["items"]): add("prod", 3, tier=ti, k=k, item=it, trans="push" if k else "rise")
-add("outro", 8, trans="wipe")
+    add("tier", BT, tier=ti, trans="wipe")
+    for k, it in enumerate(T["items"]): add("prod", BP, tier=ti, k=k, item=it, trans="push" if k else "rise")
+add("outro", BO, trans="wipe")
 t = 0.0
 for s in scenes: s["t0"] = t; t += s["beats"] * B; s["t1"] = t
 DUR = round(t, 3)

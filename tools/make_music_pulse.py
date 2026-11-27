@@ -12,7 +12,8 @@ def add(x, s0, pan=0.5, g=1.0):
 # Am9 – Fmaj7 – Cmaj7/E – G6, 2 compassos cada
 chords = [[45, 60, 64, 67, 71], [41, 57, 60, 64, 69], [40, 55, 59, 64, 67], [43, 55, 59, 62, 64]]
 bar = 4 * B; clen = 2 * bar; nb = int(DUR / B) + 1
-INTRO_BEATS = 6   # pulso entra depois da abertura
+import os
+INTRO_BEATS = int(os.environ.get("INTRO_BEATS", 6))   # pulso entra depois da abertura
 for c in range(int(DUR / clen) + 1):
     notes = chords[c % 4]; c0 = c * clen; tt = np.arange(int((clen + 1.2) * SR)) / SR
     env = np.minimum(tt / 0.9, 1) * np.exp(-np.maximum(tt - clen, 0) / 0.4)

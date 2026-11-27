@@ -99,3 +99,12 @@ M9=$(ffmpeg -hide_banner -i "$AW/music.wav" -af loudnorm=I=-15:TP=-1.5:LRA=9:pri
 w9(){ echo "$M9" | python3 -c "import json,sys;print(json.load(sys.stdin)['$1'])"; }
 python3 -I "$R/tools/semijoias_valores.py" - | ffmpeg -v error -y -f rawvideo -pix_fmt rgb24 -s 1080x1920 -r 30 -i - -i "$AW/music.wav" -map 0:v -map 1:a -af "loudnorm=I=-15:TP=-1.5:LRA=9:measured_I=$(w9 input_i):measured_TP=$(w9 input_tp):measured_LRA=$(w9 input_lra):measured_thresh=$(w9 input_thresh):offset=$(w9 target_offset):linear=true" -c:v libx264 -preset slow -crf 16 -profile:v high -pix_fmt yuv420p -c:a aac -b:a 256k -movflags +faststart -t "$DUR9" "$R/output/Semijoias_Por_Valor_HQ.mp4"
 rm -rf "$AW"
+
+# ---- Vídeo: Semijoias por valor — versão para LOCUÇÃO (cenas mais longas, trilha baixinha de fundo) ----
+AW="$(mktemp -d)"
+DUR10=$(LOCUCAO=1 DUR_ONLY=1 python3 -I "$R/tools/semijoias_valores.py" -)
+INTRO_BEATS=8 python3 -I "$R/tools/make_music_pulse.py" "$DUR10" "$AW/music.wav" >/dev/null
+M10=$(ffmpeg -hide_banner -i "$AW/music.wav" -af loudnorm=I=-24:TP=-3:LRA=9:print_format=json -f null - 2>&1 | sed -n '/^{/,/^}/p')
+w10(){ echo "$M10" | python3 -c "import json,sys;print(json.load(sys.stdin)['$1'])"; }
+LOCUCAO=1 python3 -I "$R/tools/semijoias_valores.py" - | ffmpeg -v error -y -f rawvideo -pix_fmt rgb24 -s 1080x1920 -r 30 -i - -i "$AW/music.wav" -map 0:v -map 1:a -af "loudnorm=I=-24:TP=-3:LRA=9:measured_I=$(w10 input_i):measured_TP=$(w10 input_tp):measured_LRA=$(w10 input_lra):measured_thresh=$(w10 input_thresh):offset=$(w10 target_offset):linear=true" -c:v libx264 -preset slow -crf 16 -profile:v high -pix_fmt yuv420p -c:a aac -b:a 256k -movflags +faststart -t "$DUR10" "$R/output/Semijoias_Por_Valor_LOCUCAO.mp4"
+rm -rf "$AW"
