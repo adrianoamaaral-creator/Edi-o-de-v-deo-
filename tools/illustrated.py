@@ -126,6 +126,19 @@ slides=[
  dict(t0=29.8,t1=34.5,th=LIGHT,title="Ya no hay excusa",sub="para lucir tus labios\ncon volumen",icon=ico_final),
  dict(t0=34.5,t1=DUR,th=DARK,end=True),
 ]
+import os
+if os.environ.get("CURTO"):
+    # versão curta (25 s): só os pontos principais, sincronizada com tools/cut_audio.py
+    DUR=25.0
+    slides=[
+     dict(t0=0.0,t1=2.87,th=LIGHT,title="¿Miedo a\nlas agujas?",icon=ico_syringe),
+     dict(t0=2.87,t1=5.9,th=LIGHT,title="¿Quieres más\nvolumen?",sub="Labios más llenos y definidos",icon=ico_volume),
+     dict(t0=5.9,t1=10.4,th=DARK,title="Hyaluron Pen",sub="Volumen en labios sin agujas",icon=ico_pen),
+     dict(t0=10.4,t1=13.6,th=LIGHT,title="Más sutil,\nmás natural",icon=ico_sparkle),
+     dict(t0=13.6,t1=16.3,th=LIGHT,title="Te encantará\nel resultado",icon=ico_heart),
+     dict(t0=16.3,t1=21.4,th=LIGHT,title="Ya no hay excusa",sub="para lucir tus labios\ncon volumen",icon=ico_final),
+     dict(t0=21.4,t1=DUR,th=DARK,end=True),
+    ]
 N=len(slides)
 def build(s):
     th=s["th"]; s["bg"]=gradient(*th["bg"]); s["hdr"]=header(th); L=[]
@@ -174,7 +187,7 @@ def bars(fr,t,th):
     fr.alpha_composite(ov)
 XF=0.4
 out=sys.stdout.buffer
-nfr=int(round(DUR*FPS)); prev_ts=[0.5,3,9,15,19,24,28,32,37.5] if PREVIEW else None
+nfr=int(round(DUR*FPS)); prev_ts=[float(x) for x in os.environ.get('PREV_TS','0.5,3,9,15,19,24,28,32,37.5').split(',')] if PREVIEW else None
 for n in range(nfr):
     t=n/FPS
     if PREVIEW and not any(abs(t-pt)<0.5/FPS for pt in prev_ts): continue

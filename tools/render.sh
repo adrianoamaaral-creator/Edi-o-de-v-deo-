@@ -19,3 +19,11 @@ mkdir -p "$R/output"
 ffmpeg -v error -y -i "$V" $(for n in brand hook product benefit cta end; do echo "-loop 1 -t 40.17 -i $OV/$n.png"; done) -filter_complex "$FC" -map "[vout]" -map "[aout]" -c:v libx264 -preset slow -crf 19 -profile:v high -r 30 -c:a aac -b:a 192k -ar 44100 -movflags +faststart -t 40.17 "$R/output/BB_Estetica_Avanzada_Hyaluron_Pen.mp4"
 python3 -I "$R/tools/illustrated.py" "$FD" - | ffmpeg -v error -y -f rawvideo -pix_fmt rgb24 -s 1080x1920 -r 30 -i - -i "$V" -map 0:v -map 1:a -af "highpass=f=70,$LN,alimiter=limit=0.8,afade=t=out:st=37.4:d=1,apad" -c:v libx264 -preset slow -crf 18 -pix_fmt yuv420p -tune animation -c:a aac -b:a 192k -movflags +faststart -t 40.17 "$R/output/BB_Estetica_Avanzada_Hyaluron_Pen_Ilustrado.mp4"
 rm -rf "$OV"
+
+# ---- Versão curta (25 s, só pontos principais, sem o efeito sonoro da abertura) ----
+AW="$(mktemp -d)"; ffmpeg -v error -y -i "$V" -vn -ac 2 -ar 44100 "$AW/orig.wav"; python3 -I "$R/tools/cut_audio.py" "$AW/orig.wav" "$AW/curto.wav"
+M2=$(ffmpeg -hide_banner -i "$AW/curto.wav" -af highpass=f=70,loudnorm=I=-14:TP=-1.5:LRA=11:print_format=json -f null - 2>&1 | sed -n '/^{/,/^}/p')
+h(){ echo "$M2" | python3 -c "import json,sys;print(json.load(sys.stdin)['$1'])"; }
+LN2="loudnorm=I=-14:TP=-1.5:LRA=11:measured_I=$(h input_i):measured_TP=$(h input_tp):measured_LRA=$(h input_lra):measured_thresh=$(h input_thresh):offset=$(h target_offset):linear=true"
+CURTO=1 python3 -I "$R/tools/illustrated.py" "$FD" - | ffmpeg -v error -y -f rawvideo -pix_fmt rgb24 -s 1080x1920 -r 30 -i - -i "$AW/curto.wav" -map 0:v -map 1:a -af "highpass=f=70,$LN2,alimiter=limit=0.8" -c:v libx264 -preset slow -crf 18 -pix_fmt yuv420p -tune animation -c:a aac -b:a 192k -movflags +faststart -t 25 "$R/output/BB_Hyaluron_Pen_Curto.mp4"
+rm -rf "$AW"
