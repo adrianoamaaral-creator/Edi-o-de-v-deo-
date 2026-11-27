@@ -35,3 +35,14 @@ k(){ echo "$M3" | python3 -c "import json,sys;print(json.load(sys.stdin)['$1'])"
 LN3="loudnorm=I=-14:TP=-1.5:LRA=11:measured_I=$(k input_i):measured_TP=$(k input_tp):measured_LRA=$(k input_lra):measured_thresh=$(k input_thresh):offset=$(k target_offset):linear=true"
 python3 -I "$R/tools/claude_style.py" "$FD" - | ffmpeg -v error -y -f rawvideo -pix_fmt rgb24 -s 1080x1920 -r 30 -i - -i "$AW/curto.wav" -map 0:v -map 1:a -af "highpass=f=70,$LN3,alimiter=limit=0.8" -c:v libx264 -preset slow -crf 19 -pix_fmt yuv420p -tune animation -c:a aac -b:a 160k -movflags +faststart -t 25 "$R/output/BB_Hyaluron_Pen_Estilo_Claude.mp4"
 rm -rf "$AW"
+
+# ---- Vídeo 2 (antes y después) em estilo Claude ----
+# Uso: V2=video2.mp4 tools/render.sh VIDEO_ORIGINAL.mp4 FONTS_DIR
+if [ -n "${V2:-}" ]; then
+AW="$(mktemp -d)"; ffmpeg -v error -y -i "$V2" -vn -ac 2 -ar 44100 "$AW/orig.wav"; STORY=v2 python3 -I "$R/tools/cut_audio.py" "$AW/orig.wav" "$AW/curto.wav" >/dev/null
+M4=$(ffmpeg -hide_banner -i "$AW/curto.wav" -af highpass=f=70,loudnorm=I=-14:TP=-1.5:LRA=11:print_format=json -f null - 2>&1 | sed -n '/^{/,/^}/p')
+q(){ echo "$M4" | python3 -c "import json,sys;print(json.load(sys.stdin)['$1'])"; }
+LN4="loudnorm=I=-14:TP=-1.5:LRA=11:measured_I=$(q input_i):measured_TP=$(q input_tp):measured_LRA=$(q input_lra):measured_thresh=$(q input_thresh):offset=$(q target_offset):linear=true"
+STORY=v2 python3 -I "$R/tools/claude_style.py" "$FD" - | ffmpeg -v error -y -f rawvideo -pix_fmt rgb24 -s 1080x1920 -r 30 -i - -i "$AW/curto.wav" -map 0:v -map 1:a -af "highpass=f=70,$LN4,alimiter=limit=0.8" -c:v libx264 -preset slow -crf 19 -pix_fmt yuv420p -tune animation -c:a aac -b:a 160k -movflags +faststart -t 24 "$R/output/BB_Hyaluron_Pen_Antes_Despues_Estilo_Claude.mp4"
+rm -rf "$AW"
+fi

@@ -171,6 +171,27 @@ slides = [
  dict(t0=16.3, t1=21.4, th=LIGHT, title="Ya no hay\nexcusa.", sub="Para lucir tus labios con volumen.", icon=icon_final),
  dict(t0=21.4, t1=DUR, th=LIGHT, end=True),
 ]
+
+def icon_dual():
+    st, fill = lips_strokes(-95, 30, 0.55)
+    S = [(p, 5) for p in st]
+    # silhueta simples de corpo (cintura) à direita
+    body_l = [(70, -150), (60, -90), (80, -20), (62, 60), (75, 150)]
+    body_r = [(170, -150), (180, -90), (160, -20), (178, 60), (165, 150)]
+    S += [(catmull(body_l, closed=False), 5), (catmull(body_r, closed=False), 5)]
+    S += [(star_pts(-150, -120, 26), 4), (star_pts(215, -60, 18), 4)]
+    return [(blob(-95, 20, 140, 11), CLAY_SOFT), (blob(120, 10, 125, 12), CLAY_SOFT), (fill, CLAY)], S
+
+if os.environ.get("STORY") == "v2":
+    DUR = 24.0
+    slides = [
+     dict(t0=0.0, t1=4.6, th=DARK, kicker="Para quien no lo conoce", title="Hyaluron Pen", icon=icon_pen),
+     dict(t0=4.6, t1=8.5, th=LIGHT, title="Facial y\ncorporal.", sub="Sirve para tratamientos de cuerpo y rostro.", icon=icon_dual),
+     dict(t0=8.5, t1=17.6, th=LIGHT, ba=True, phases=[(0.0, "De esto…", None), (2.8, "…a esto.", None),
+          (4.5, "Adiós a las marcas.", "Del surco nasogeniano, sin agujas.")]),
+     dict(t0=17.6, t1=20.6, th=LIGHT, title="Sin agujas.", sub="Y sin sufrimiento.", icon=icon_syringe),
+     dict(t0=20.6, t1=DUR, th=LIGHT, end=True),
+    ]
 N = len(slides)
 TF = serif(104, 450); SUBF = sans(40, 400); KF = sans(28, 600)
 
@@ -189,6 +210,30 @@ def build(s, idx):
         d.text((W / 2, 1158), "Reserva tu cita", font=sans(40, 600), fill=(250, 247, 240, 255), anchor="mm")
         d.text((W / 2, 1290), "@brunaborgesestetic", font=sans(34, 500), fill=GRAY + (255,), anchor="mm")
         L.append((im.crop(im.getbbox()), im.getbbox()[:2], 0.55)); s["layers"] = L; return
+    if s.get("ba"):
+        ph = []
+        for (t, title, sub) in s["phases"]:
+            it, y2 = layout_words(title, TF, MX, 330, 124); render_words(it, th["ink"]); sw = None
+            if sub: sw, _ = layout_words(sub, SUBF, MX, y2 + 30, 56); render_words(sw, th["gray"])
+            ph.append((t, it, sw))
+        s["ph"] = ph
+        ad = os.path.join(os.path.dirname(os.environ["LOGO"]), "antes_despues")
+        PW, PH = 520, 388; s["pw"] = (PW, PH)
+        def framed(path, label):
+            ph_ = Image.open(path).convert("RGBA").resize((PW, PH), Image.LANCZOS)
+            m = Image.new("L", (PW, PH), 0); ImageDraw.Draw(m).rounded_rectangle((0, 0, PW - 1, PH - 1), radius=18, fill=255); ph_.putalpha(m)
+            card = Image.new("RGBA", (PW + 20, PH + 80), (0, 0, 0, 0)); d = ImageDraw.Draw(card)
+            d.text((4, 0), label, font=sans(30, 600), fill=th["ink"] + (255,))
+            d.rounded_rectangle((14, 64, PW + 14, PH + 60), radius=18, fill=CLAY_SOFT + (255,))
+            card.alpha_composite(ph_, (4, 54))
+            T = [(4 + x, 54 + y) for x, y in wobble(resample(rect(0, 0, PW, PH)), 1.2, 5)]
+            d.line(T, fill=th["ink"] + (255,), width=3, joint="curve")
+            return card
+        s["antes"] = framed(os.path.join(ad, "antes.png"), "Antes"); s["despues"] = framed(os.path.join(ad, "despues.png"), "Después")
+        s["py"] = 600
+        im = Image.new("RGBA", (W, 60), (0, 0, 0, 0)); d = ImageDraw.Draw(im)
+        d.text((W / 2, 10), "Imágenes del vídeo original · Los resultados pueden variar.", anchor="ma", font=sans(24, 400), fill=th["gray"] + (255,))
+        s["note"] = im; return
     y = 330
     if s.get("kicker"):
         it, _ = layout_words(s["kicker"].upper(), KF, MX, y, 40); render_words(it, th["accent"]); s["kick"] = it; y += 70
@@ -214,6 +259,32 @@ def render_slide(s, lt):
         for im, (x, y), dl in s["layers"]:
             p = ease((lt - dl) / 0.6)
             if p > 0: fr.alpha_composite(alpha(im, p), (int(x), int(y + (1 - p) * 20)))
+        return fr
+    if s.get("ba"):
+        ph = s["ph"]
+        for j, (t, it, sw) in enumerate(ph):
+            nxt = ph[j + 1][0] if j + 1 < len(ph) else 1e9
+            if lt < t or lt > nxt + 0.25: continue
+            tmp = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+            words_on(tmp, it, lt, t + 0.05, 0.08)
+            if sw: words_on(tmp, sw, lt, t + 0.05 + len(it) * 0.08 + 0.2, 0.04)
+            k = 1 - min(max((lt - nxt) / 0.25, 0), 1)
+            fr.alpha_composite(alpha(tmp, k))
+        PW, PH = s["pw"]; y0 = s["py"]
+        CX = (W - PW) // 2 - 4; Y2 = y0 + PH + 90
+        for card, yy, st in ((s["antes"], y0, 0.15), (s["despues"], Y2, 2.8)):
+            p = ease((lt - st) / 0.5)
+            if p > 0: fr.alpha_composite(alpha(card, p), (CX, int(yy + (1 - p) * 30)))
+        # círculo à mão sobre o sulco nasogeniano (desenha a partir da fase 3)
+        p = min(max((lt - 4.7) / 0.9, 0), 1)
+        if p > 0:
+            ov = Image.new("RGBA", (W, H), (0, 0, 0, 0)); d = ImageDraw.Draw(ov)
+            for k, yy in enumerate((y0, Y2)):
+                pts = [(CX + 4 + 142 + 77 * math.cos(a), yy + 54 + 204 + 118 * math.sin(a)) for a in [-1.9 + 6.6 * i / 120 for i in range(121)]]
+                pts = wobble(pts, 2.0, 40 + k)[:max(2, int(121 * ease(p)))]
+                d.line(pts, fill=CLAY + (255,), width=7, joint="curve")
+            fr.alpha_composite(ov)
+        if lt > 0.6: fr.alpha_composite(alpha(s["note"], ease((lt - 0.6) / 0.5)), (0, Y2 + PH + 76))
         return fr
     if s.get("kick"): words_on(fr, s["kick"], lt, 0.0, 0.05)
     words_on(fr, s["words"], lt, 0.15, 0.09)

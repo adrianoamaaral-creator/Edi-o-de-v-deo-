@@ -7,12 +7,18 @@ SEGS=[  # (início, fim) no áudio original, em segundos
 ]
 GAP_AFTER={1:0.30,4:0.30}  # respiro entre blocos de ideia
 LEAD=0.5; TOTAL=25.0
+import os
+if os.environ.get("STORY")=="v2":   # vídeo 2: antes y después
+    SEGS=[(7.0,17.65),   # "Y para quien no sabe, el Hyaluron Pen sirve tanto para tratamientos corporales como faciales. Y uno de ellos es pasar de esto…"
+          (19.15,28.35)] # "…a esto. Eliminar las marcas de expresión del surco nasogeniano. Y sin el sufrimiento de agujas."
+    GAP_AFTER={0:0.25}; LEAD=0.4; TOTAL=24.0
 w=wave.open(sys.argv[1]); sr=w.getframerate(); ch=w.getnchannels()
 a=np.frombuffer(w.readframes(w.getnframes()),dtype=np.int16).reshape(-1,ch).astype(np.float32)
 out=[np.zeros((int(LEAD*sr),ch),np.float32)]; t=LEAD
 for i,(s,e) in enumerate(SEGS):
-    seg=a[int(s*sr):int(e*sr)].copy(); n=len(seg); f=int(0.02*sr)
-    ramp=np.linspace(0,1,f)[:,None]; seg[:f]*=ramp; seg[-f:]*=ramp[::-1]
+    f0=0.12 if (i==0 and os.environ.get("STORY")=="v2") else 0.02
+    seg=a[int(s*sr):int(e*sr)].copy(); n=len(seg); f=int(0.02*sr); fi=int(f0*sr)
+    ramp=np.linspace(0,1,f)[:,None]; seg[:fi]*=np.linspace(0,1,fi)[:,None]; seg[-f:]*=ramp[::-1]
     print(f"seg{i} orig {s:.2f}-{e:.2f} -> out {t:.2f}-{t+n/sr:.2f}"); out.append(seg); t+=n/sr
     g=GAP_AFTER.get(i,0)
     if g: out.append(np.zeros((int(g*sr),ch),np.float32)); t+=g
