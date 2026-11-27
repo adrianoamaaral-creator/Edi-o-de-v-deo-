@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Flor de Lótus</title>
+<meta name="description" content="Flor de Lótus — trajes para noiva, madrinha, formanda, convidada, noivo, padrinho, formando, convidado e pajens. Fale conosco no WhatsApp.">
+<meta property="og:title" content="Flor de Lótus">
+<meta property="og:description" content="Trajes femininos e masculinos para casamentos, formaturas e festas.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* =====================================================================
+   EDITE AQUI: dados da loja ficam no bloco <script> no final do arquivo
+   ===================================================================== */
+:root{
+  --bg:#fbf6f3; --bg2:#f4e7e4; --card:#ffffff; --ink:#3b2433; --muted:#7d6573;
+  --rose:#c98b9a; --plum:#6e3a59; --gold:#b8935a; --line:#ead8d6;
+  --wa:#1f9d55; --shadow:0 6px 22px rgba(110,58,89,.10);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#1d1419; --bg2:#2a1c24; --card:#2b1f27; --ink:#f6e9ee; --muted:#c4adb9;
+    --rose:#e0a6b4; --plum:#e7b8cf; --gold:#d9b77f; --line:#3d2b36;
+    --wa:#2fb86a; --shadow:0 6px 22px rgba(0,0,0,.35);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#1d1419; --bg2:#2a1c24; --card:#2b1f27; --ink:#f6e9ee; --muted:#c4adb9;
+  --rose:#e0a6b4; --plum:#e7b8cf; --gold:#d9b77f; --line:#3d2b36;
+  --wa:#2fb86a; --shadow:0 6px 22px rgba(0,0,0,.35);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{
+  font-family:"Montserrat",system-ui,sans-serif; color:var(--ink);
+  background:var(--bg);
+  background-image:radial-gradient(1200px 500px at 50% -120px,var(--bg2),transparent 70%);
+  min-height:100vh; line-height:1.5;
+}
+.wrap{max-width:460px;margin:0 auto;padding:40px 16px 48px}
+header{text-align:center;margin-bottom:28px}
+.logo{width:96px;height:96px;margin:0 auto 14px;border-radius:50%;
+  background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow);
+  display:grid;place-items:center}
+.logo svg{width:62px;height:62px}
+h1{font-family:"Cormorant Garamond",serif;font-weight:600;font-size:2.4rem;
+  letter-spacing:.02em;color:var(--plum);line-height:1.1}
+.tag{font-size:.78rem;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);margin-top:6px}
+.intro{color:var(--muted);font-size:.93rem;margin-top:12px}
+
+.btn{display:flex;align-items:center;gap:14px;width:100%;text-decoration:none;
+  background:var(--card);color:var(--ink);border:1px solid var(--line);
+  border-radius:16px;padding:15px 18px;margin-bottom:12px;box-shadow:var(--shadow);
+  font-weight:500;font-size:.97rem;transition:transform .15s,border-color .15s}
+.btn:hover{transform:translateY(-2px);border-color:var(--rose)}
+.btn:active{transform:scale(.98)}
+.btn svg{width:24px;height:24px;flex:none;color:var(--plum)}
+.btn span{flex:1}
+.btn small{display:block;font-weight:400;color:var(--muted);font-size:.78rem}
+.btn .arrow{width:16px;height:16px;color:var(--muted)}
+.btn.wa{background:var(--wa);color:#fff;border-color:transparent}
+.btn.wa svg,.btn.wa small,.btn.wa .arrow{color:#fff}
+.btn.wa small{opacity:.9}
+
+h2{font-family:"Cormorant Garamond",serif;font-weight:600;font-size:1.6rem;
+  color:var(--plum);text-align:center;margin:34px 0 4px}
+.sub{text-align:center;color:var(--muted);font-size:.85rem;margin-bottom:16px}
+.divider{display:flex;align-items:center;gap:12px;color:var(--gold);margin:30px 0 0}
+.divider::before,.divider::after{content:"";flex:1;height:1px;background:var(--line)}
+
+.group{background:var(--card);border:1px solid var(--line);border-radius:20px;
+  padding:18px 16px 14px;margin-bottom:14px;box-shadow:var(--shadow)}
+.group h3{font-size:.75rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);
+  text-align:center;margin-bottom:12px;font-weight:600}
+.chips{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}
+.chip{display:block;text-align:center;text-decoration:none;color:var(--ink);
+  border:1px solid var(--line);border-radius:999px;padding:10px 8px;font-size:.9rem;
+  background:var(--bg);transition:background .15s,border-color .15s}
+.chip:hover{border-color:var(--rose);background:var(--bg2)}
+.chip:last-child:nth-child(odd){grid-column:1 / -1}
+.hint{text-align:center;color:var(--muted);font-size:.76rem;margin-top:10px}
+
+.special{border:1px dashed var(--gold);background:var(--card);border-radius:20px;
+  padding:22px 18px;text-align:center;margin-top:18px}
+.special h3{font-family:"Cormorant Garamond",serif;font-size:1.45rem;color:var(--plum);margin-bottom:6px;font-weight:600}
+.special p{color:var(--muted);font-size:.9rem;margin-bottom:16px}
+.special .btn{margin:0}
+
+footer{text-align:center;color:var(--muted);font-size:.78rem;margin-top:36px}
+footer .social{display:flex;justify-content:center;gap:12px;margin-bottom:12px}
+footer .social a{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;
+  background:var(--card);border:1px solid var(--line);color:var(--plum)}
+footer .social svg{width:20px;height:20px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="logo" aria-hidden="true">
+      <!-- Pode trocar por <img src="logo.png" style="width:100%;height:100%;border-radius:50%;object-fit:cover"> -->
+      <svg viewBox="0 0 64 64" fill="none">
+        <path d="M32 12c6 7 8 15 0 30-8-15-6-23 0-30z" fill="#c98b9a"/>
+        <path d="M32 42c-3-10-11-17-21-18 2 10 9 17 21 18z" fill="#dba7b3"/>
+        <path d="M32 42c3-10 11-17 21-18-2 10-9 17-21 18z" fill="#dba7b3"/>
+        <path d="M32 42C24 36 14 35 6 38c6 6 16 7 26 4z" fill="#e9c3cb"/>
+        <path d="M32 42c8-6 18-7 26-4-6 6-16 7-26 4z" fill="#e9c3cb"/>
+        <path d="M14 48c6 3 30 3 36 0" stroke="#b8935a" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <h1 id="nome">Flor de Lótus</h1>
+    <p class="tag">Trajes para momentos especiais</p>
+    <p class="intro">Casamentos, formaturas e festas — moda feminina e masculina para você brilhar no seu grande dia.</p>
+  </header>
+
+  <a class="btn wa" data-wa="Olá! Vim pelo Instagram e gostaria de atendimento." href="#">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.5 14.4c-.3-.1-1.8-.9-2-1-.3-.1-.5-.1-.7.1-.2.3-.8 1-.9 1.2-.2.2-.3.2-.6.1-.3-.1-1.3-.5-2.4-1.5-.9-.8-1.5-1.8-1.7-2.1-.2-.3 0-.5.1-.6l.4-.5c.2-.2.2-.3.3-.5.1-.2 0-.4 0-.5l-.9-2.2c-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.5s1.1 2.9 1.2 3.1c.1.2 2.1 3.2 5.1 4.5.7.3 1.3.5 1.7.6.7.2 1.4.2 1.9.1.6-.1 1.8-.7 2-1.4.2-.7.2-1.3.2-1.4-.1-.1-.3-.2-.6-.3zM12 21.8c-1.8 0-3.5-.5-5-1.4l-.4-.2-3.7 1 1-3.6-.2-.4A9.8 9.8 0 1 1 12 21.8zm0-21.6A11.8 11.8 0 0 0 1.9 17.9L.2 24l6.3-1.6A11.8 11.8 0 1 0 12 .2z"/></svg>
+    <span>Fale no WhatsApp<small>Atendimento e agendamento de prova</small></span>
+    <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg>
+  </a>
+
+  <a class="btn" id="catalogo" href="#" target="_blank" rel="noopener">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 5a2 2 0 0 1 2-2h12v18H6a2 2 0 0 1-2-2z"/><path d="M8 7h6M8 11h6"/></svg>
+    <span>Nosso catálogo<small>Veja modelos de vestidos e trajes</small></span>
+    <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg>
+  </a>
+
+  <a class="btn" id="mapa" href="#" target="_blank" rel="noopener">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>
+    <span>Como chegar<small id="endereco">Endereço da loja</small></span>
+    <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg>
+  </a>
+
+  <a class="btn" id="telefone" href="#">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg>
+    <span>Ligar para a loja<small id="telefoneTxt">Telefone</small></span>
+    <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg>
+  </a>
+
+  <div class="divider">✦</div>
+  <h2>Trabalhamos com</h2>
+  <p class="sub">Toque na opção e fale direto com a gente</p>
+
+  <div class="group">
+    <h3>Feminino</h3>
+    <div class="chips">
+      <a class="chip" data-wa="Olá! Gostaria de ver opções de vestido para NOIVA." href="#">Noiva</a>
+      <a class="chip" data-wa="Olá! Gostaria de ver opções de vestido para MADRINHA." href="#">Madrinha</a>
+      <a class="chip" data-wa="Olá! Gostaria de ver opções de vestido para FORMANDA." href="#">Formanda</a>
+      <a class="chip" data-wa="Olá! Gostaria de ver opções de vestido para CONVIDADA." href="#">Convidada</a>
+    </div>
+  </div>
+
+  <div class="group">
+    <h3>Masculino</h3>
+    <div class="chips">
+      <a class="chip" data-wa="Olá! Gostaria de ver opções de traje para NOIVO." href="#">Noivo</a>
+      <a class="chip" data-wa="Olá! Gostaria de ver opções de traje para PADRINHO." href="#">Padrinho</a>
+      <a class="chip" data-wa="Olá! Gostaria de ver opções de traje para FORMANDO." href="#">Formando</a>
+      <a class="chip" data-wa="Olá! Gostaria de ver opções de traje para CONVIDADO." href="#">Convidado</a>
+      <a class="chip" data-wa="Olá! Gostaria de ver opções de traje para PAJEM." href="#">Pajens</a>
+    </div>
+  </div>
+
+  <div class="special">
+    <h3>Não encontrou o que procura?</h3>
+    <p>Procurando um terno, vestido ou peça específica? Mande uma mensagem no nosso WhatsApp: fazemos uma cotação e trazemos <strong>sob encomenda</strong> para você.</p>
+    <a class="btn wa" data-wa="Olá! Estou procurando uma peça específica e gostaria de uma cotação sob encomenda." href="#">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.5 14.4c-.3-.1-1.8-.9-2-1-.3-.1-.5-.1-.7.1-.2.3-.8 1-.9 1.2-.2.2-.3.2-.6.1-.3-.1-1.3-.5-2.4-1.5-.9-.8-1.5-1.8-1.7-2.1-.2-.3 0-.5.1-.6l.4-.5c.2-.2.2-.3.3-.5.1-.2 0-.4 0-.5l-.9-2.2c-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.5s1.1 2.9 1.2 3.1c.1.2 2.1 3.2 5.1 4.5.7.3 1.3.5 1.7.6.7.2 1.4.2 1.9.1.6-.1 1.8-.7 2-1.4.2-.7.2-1.3.2-1.4-.1-.1-.3-.2-.6-.3zM12 21.8c-1.8 0-3.5-.5-5-1.4l-.4-.2-3.7 1 1-3.6-.2-.4A9.8 9.8 0 1 1 12 21.8zm0-21.6A11.8 11.8 0 0 0 1.9 17.9L.2 24l6.3-1.6A11.8 11.8 0 1 0 12 .2z"/></svg>
+      <span>Pedir cotação sob encomenda</span>
+      <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg>
+    </a>
+  </div>
+
+  <footer>
+    <div class="social">
+      <a id="instagram" href="#" target="_blank" rel="noopener" aria-label="Instagram">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor"/></svg>
+      </a>
+    </div>
+    <p id="horario">Seg a Sex 9h–18h · Sáb 9h–13h</p>
+    <p>© <span id="ano"></span> Flor de Lótus</p>
+  </footer>
+</div>
+
+<script>
+/* =====================================================================
+   DADOS DA LOJA — troque os valores abaixo
+   ===================================================================== */
+const LOJA = {
+  whatsapp:  "5500000000000",              // só números: 55 + DDD + número
+  telefone:  "(00) 0000-0000",             // como aparece na tela
+  endereco:  "Rua Exemplo, 123 – Centro, Cidade/UF",
+  mapa:      "",                           // link do Google Maps (vazio = busca pelo endereço)
+  catalogo:  "https://wa.me/c/5500000000000", // catálogo do WhatsApp Business ou outro link
+  instagram: "https://instagram.com/flordelotus",
+  horario:   "Seg a Sex 9h–18h · Sáb 9h–13h"
+};
+
+const wa = msg => "https://wa.me/" + LOJA.whatsapp + "?text=" + encodeURIComponent(msg);
+document.querySelectorAll("[data-wa]").forEach(a => {
+  a.href = wa(a.dataset.wa); a.target = "_blank"; a.rel = "noopener";
+});
+const $ = id => document.getElementById(id);
+$("catalogo").href = LOJA.catalogo;
+$("mapa").href = LOJA.mapa || "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(LOJA.endereco);
+$("endereco").textContent = LOJA.endereco;
+$("telefone").href = "tel:+" + LOJA.telefone.replace(/\D/g, "").replace(/^(?!55)/, "55");
+$("telefoneTxt").textContent = LOJA.telefone;
+$("instagram").href = LOJA.instagram;
+$("horario").textContent = LOJA.horario;
+$("ano").textContent = new Date().getFullYear();
+</script>
+</body>
+</html>
