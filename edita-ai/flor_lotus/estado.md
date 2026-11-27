@@ -3,7 +3,7 @@
 ## Cartão da marca (proposto, aguardando aprovação)
 CARTÃO DA MARCA · Edita.AI
 Marca: Flor de Lótus · @flordelotusvestidos | Vende: aluguel de vestidos e trajes de festa (madrinhas, noivas, formandas, convidadas, ternos, acessórios) — Cristalina-GO | Jeito: sofisticada e acolhedora
-Cores: fundo #0E0C0D · texto #FFFFFF · destaque #C9A08F (rosé) · faixa #3B2A2D
+Cores: fundo #0E0C0D · texto #FFFFFF · destaque #D48C8C (rosa do logo) · faixa #3B2A2D
 Fontes: título Playfair Display 700 (itálico na palavra-chave) · texto Montserrat 500
 Usa: ___ | Nunca: ___
 Chamada final: "Visite nossa loja" · Seg a Sex, 13h30 às 17h30 · @flordelotusvestidos
