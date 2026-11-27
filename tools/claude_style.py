@@ -167,7 +167,7 @@ slides = [
  dict(t0=2.87, t1=5.9, th=LIGHT, title="¿Quieres más\nvolumen?", sub="Labios más llenos y definidos.", icon=icon_volume),
  dict(t0=5.9, t1=10.4, th=DARK, kicker="Te presento", title="Hyaluron Pen", sub="Volumen en labios, sin agujas.", icon=icon_pen),
  # antes/después de labios (fotos em assets/labios)
- dict(t0=10.4, t1=16.3, th=LIGHT, ba=True, imgs=("labios/antes_recorte.png", "labios/despues_recorte.png"), ph_h=428,
+ dict(t0=10.4, t1=16.3, th=LIGHT, ba=True, imgs=("labios2/antes_recorte.png", "labios2/despues_recorte.png"), pw_w=580, ph_h=446, lips_ring=3.3,
       d_start=1.6, circle=False, note="Resultados reales · Los resultados pueden variar.",
       phases=[(0.0, "Más natural.", "Un volumen sutil y armonioso."), (3.2, "El resultado.", "Te va a encantar.")]),
  dict(t0=16.3, t1=21.4, th=LIGHT, title="Ya no hay\nexcusa.", sub="Para lucir tus labios con volumen.", icon=icon_final),
@@ -221,7 +221,7 @@ def build(s, idx):
         s["ph"] = ph
         ad = os.path.dirname(os.environ["LOGO"])
         imgs = s.get("imgs", ("antes_despues/antes.png", "antes_despues/despues.png"))
-        PW, PH = 520, s.get("ph_h", 388); s["pw"] = (PW, PH)
+        PW, PH = s.get("pw_w", 520), s.get("ph_h", 388); s["pw"] = (PW, PH)
         def framed(path, label):
             ph_ = Image.open(path).convert("RGBA").resize((PW, PH), Image.LANCZOS)
             m = Image.new("L", (PW, PH), 0); ImageDraw.Draw(m).rounded_rectangle((0, 0, PW - 1, PH - 1), radius=18, fill=255); ph_.putalpha(m)
@@ -287,6 +287,14 @@ def render_slide(s, lt):
                 pts = wobble(pts, 2.0, 40 + k)[:max(2, int(121 * ease(p)))]
                 d.line(pts, fill=CLAY + (255,), width=7, joint="curve")
             fr.alpha_composite(ov)
+        if s.get("lips_ring") is not None:   # contorno à mão em volta dos lábios no "Después"
+            p = min(max((lt - s["lips_ring"]) / 0.9, 0), 1)
+            if p > 0:
+                ov = Image.new("RGBA", (W, H), (0, 0, 0, 0)); d = ImageDraw.Draw(ov)
+                ecx, ecy = CX + 4 + PW / 2, Y2 + 54 + PH * 0.47
+                pts = [(ecx + PW * 0.34 * math.cos(a), ecy + PH * 0.25 * math.sin(a)) for a in [3.6 + 6.7 * i / 140 for i in range(141)]]
+                pts = wobble(pts, 2.2, 77)[:max(2, int(141 * ease(p)))]
+                d.line(pts, fill=CLAY + (255,), width=8, joint="curve"); fr.alpha_composite(ov)
         if lt > 0.6: fr.alpha_composite(alpha(s["note"], ease((lt - 0.6) / 0.5)), (0, Y2 + PH + 76))
         return fr
     if s.get("kick"): words_on(fr, s["kick"], lt, 0.0, 0.05)
