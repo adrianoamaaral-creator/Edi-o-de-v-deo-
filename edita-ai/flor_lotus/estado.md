@@ -21,3 +21,10 @@ Vídeos IMG_6483.MOV e IMG_7173.MOV (~70 MB) não baixam pelo Drive: pedir pelo 
 ## Vídeo "Como funcionam os ajustes" (animado, sem aparecer)
 Roteiro aprovado. Ajuste incluso no aluguel. Prova até 15 dias antes da retirada.
 Amostra aprovada. Vídeo final: output/flor_lotus/Flor_de_Lotus_Ajustes_FINAL.mp4 (28,5 s, só efeitos sonoros — música a colocar no app).
+
+## Versão narrada (aguardando aprovação)
+Narração 73 s → 58,9 s sem pausas (pausas reduzidas a ~0,16 s; nenhuma palavra cortada, conferido por nova transcrição).
+Cenas novas: Passo 1 Medidas (loja agenda 15 dias antes), Dica do sapato, Passo 2 Cuidado (higienização + passadoria),
+Passo 3 Retirada (horário da loja), Passo 4 Devolução (capinha, sem lavar nem passar).
+Música: trilha original gerada (tools/musica_suave.py), ~14 dB abaixo da voz, abaixa quando há fala. Final -14 LUFS.
+Saída: output/flor_lotus/Flor_de_Lotus_Ajustes_Narrado.mp4 (60,4 s)
