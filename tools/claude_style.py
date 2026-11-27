@@ -189,7 +189,8 @@ if os.environ.get("STORY") == "v4":
     DUR = 47.3
     slides = [
      dict(t0=0.0, t1=2.2, th=LIGHT, title="¿Miedo a\nlas agujas?", icon=icon_syringe),
-     dict(t0=2.2, t1=5.5, th=DARK, kicker="Te presento", title="Hyaluron Pen", sub="Volumen sin agujas.", icon=icon_pen),
+     dict(t0=2.2, t1=5.5, th=DARK, kicker="Te presento", title="Hyaluron Pen", sub="Volumen sin agujas.", icon=icon_pen,
+          photo="bruna/bruna_hyaluron_pen.jpg", photo_box=(60, 430, 1071, 1720), photo_w=620),
      dict(t0=5.5, t1=16.0, th=LIGHT, title="Una clienta\nde años.", sub="Comenzó conmigo hace unos años.", icon=icon_heart),
      dict(t0=16.0, t1=37.0, th=LIGHT, ba=True, imgs=("labios2/antes_recorte.png", "labios2/despues_recorte.png"),
           pw_w=580, ph_h=446, py0=640, d_start=1.6, circle=False, lips_ring=4.2, lips_ring_end=9.3, fold_rings=11.9,
@@ -271,6 +272,16 @@ def build(s, idx):
     s["title_end"] = 0.15 + len(it) * 0.09 + 0.25
     if s.get("sub"):
         it2, y = layout_words(s["sub"], SUBF, MX, y + 30, 56); render_words(it2, th["gray"]); s["subw"] = it2
+    if s.get("photo"):   # foto em moldura à mão no lugar da ilustração
+        ph_ = Image.open(os.path.join(os.path.dirname(os.environ["LOGO"]), s["photo"])).convert("RGBA")
+        bx = s.get("photo_box"); ph_ = ph_.crop(bx) if bx else ph_
+        PW = s.get("photo_w", 600); PH = int(ph_.height * PW / ph_.width); ph_ = ph_.resize((PW, PH), Image.LANCZOS)
+        m = Image.new("L", (PW, PH), 0); ImageDraw.Draw(m).rounded_rectangle((0, 0, PW - 1, PH - 1), radius=22, fill=255); ph_.putalpha(m)
+        card = Image.new("RGBA", (PW + 24, PH + 24), (0, 0, 0, 0)); d = ImageDraw.Draw(card)
+        d.rounded_rectangle((16, 16, PW + 16, PH + 16), radius=22, fill=th["accent"] + (255,))
+        card.alpha_composite(ph_, (4, 4))
+        d.line([(4 + x, 4 + y) for x, y in wobble(resample(rect(0, 0, PW, PH)), 1.4, 9)], fill=th["line"] + (255,), width=3, joint="curve")
+        s["photo_img"] = card; s["photo_y"] = s.get("photo_y", y + 50); return
     s["spec"] = s["icon"](); s["icy"] = 1000; s["cache"] = None
 
 def ease(x): x = min(max(x, 0), 1); return 1 - (1 - x) ** 3
@@ -351,6 +362,12 @@ def render_slide(s, lt):
             dot = Image.new("RGBA", (30, 30), (0, 0, 0, 0)); ImageDraw.Draw(dot).ellipse((2, 2, 28, 28), fill=th["accent"] + (int(255 * a),))
             fr.alpha_composite(dot, (int(cx - 15), int(cy - 15)))
     if s.get("subw"): words_on(fr, s["subw"], lt, s["title_end"], 0.04)
+    if s.get("photo_img") is not None:
+        p = ease((lt - 0.2) / 0.6); card = s["photo_img"]
+        if p > 0:
+            sc = 0.94 + 0.06 * p; c2 = card.resize((int(card.width * sc), int(card.height * sc)), Image.BICUBIC) if sc < 0.999 else card
+            fr.alpha_composite(alpha(c2, p), ((W - c2.width) // 2, int(s["photo_y"] + (card.height - c2.height) / 2 + (1 - p) * 30)))
+        return fr
     p = min(max((lt - 0.25) / 1.1, 0), 1)
     if p >= 1:
         if s["cache"] is None: s["cache"] = draw_icon(s["spec"], th, 1, s["seed"])
