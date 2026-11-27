@@ -6,6 +6,8 @@ A, D, OA, OD = sys.argv[1:5]
 # pontos (x,y) nas fotos já em pé: canto esq. da boca, canto dir., centro da linha da boca, base do lábio inferior, piercing do nariz
 PA = np.float32([(520, 311), (724, 424), (625, 365), (610, 415), (590, 160)])
 PD = np.float32([(535, 380), (812, 432), (675, 387), (675, 457), (612, 207)])
+if len(sys.argv) > 5:   # pontos do DEPOIS passados como JSON, ex.: '[[865,610],[1315,700],...]'
+    import json; PD = np.float32(json.loads(sys.argv[5]))
 OW, OH, MOUTH = 1160, 892, 560          # tamanho do recorte e largura final da boca (px)
 a = cv2.imread(A); d = cv2.imread(D)
 M, _ = cv2.estimateAffine2D(PA, PD, method=cv2.LMEDS)       # antes -> espaço do depois
