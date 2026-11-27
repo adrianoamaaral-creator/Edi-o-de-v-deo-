@@ -73,3 +73,11 @@ ffmpeg -v error -y -i "$AW/voice.wav" -i "$AW/music.wav" -filter_complex "[1:a]v
 STORY=v4 TIMEMAP="$AW/map.json" python3 -I "$R/tools/claude_style.py" "$FD" - 2>/dev/null | ffmpeg -v error -y -f rawvideo -pix_fmt rgb24 -s 1080x1920 -r 30 -i - -i "$AW/mix.wav" -map 0:v -map 1:a -c:v libx264 -preset slow -crf 24 -pix_fmt yuv420p -tune animation -c:a aac -b:a 160k -movflags +faststart -t "$DUR6" "$R/output/BB_Labios_Surco_Narracion_Musica.mp4"
 
 rm -rf "$AW"
+
+# ---- Vídeo: Micropigmentación labial (ilustrado + trilha suave, sem voz) ----
+AW="$(mktemp -d)"
+python3 -I "$R/tools/make_music.py" 32 "$AW/music.wav" >/dev/null
+M7=$(ffmpeg -hide_banner -i "$AW/music.wav" -af loudnorm=I=-16:TP=-1.5:LRA=11:print_format=json -f null - 2>&1 | sed -n '/^{/,/^}/p')
+w7(){ echo "$M7" | python3 -c "import json,sys;print(json.load(sys.stdin)['$1'])"; }
+STORY=micro python3 -I "$R/tools/claude_style.py" "$FD" - | ffmpeg -v error -y -f rawvideo -pix_fmt rgb24 -s 1080x1920 -r 30 -i - -i "$AW/music.wav" -map 0:v -map 1:a -af "loudnorm=I=-16:TP=-1.5:LRA=11:measured_I=$(w7 input_i):measured_TP=$(w7 input_tp):measured_LRA=$(w7 input_lra):measured_thresh=$(w7 input_thresh):offset=$(w7 target_offset):linear=true" -c:v libx264 -preset slow -crf 14 -profile:v high -pix_fmt yuv420p -tune animation -c:a aac -b:a 256k -movflags +faststart -t 32 "$R/output/BB_Micropigmentacion_Labial_HQ.mp4"
+rm -rf "$AW"

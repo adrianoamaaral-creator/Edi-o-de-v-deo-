@@ -184,6 +184,50 @@ def icon_dual():
     S += [(star_pts(-150, -120, 26), 4), (star_pts(215, -60, 18), 4)]
     return [(blob(-95, 20, 140, 11), CLAY_SOFT), (blob(120, 10, 125, 12), CLAY_SOFT), (fill, CLAY)], S
 
+
+# ---------- ícones extras (micropigmentação) ----------
+def icon_lips_dots():
+    st, fill = lips_strokes(0, 20, 1.15)
+    S = [(p, 6) for p in st]
+    # contorno pontilhado (marcação do desenho)
+    a = 150 * 1.15 * 1.12; h = 72 * 1.15 * 1.18
+    for k in range(34):
+        t = k / 34 * 2 * math.pi; x = a * math.cos(t); y = 20 + h * math.sin(t) * (0.95 if math.sin(t) > 0 else 1.05)
+        S.append((circle(x, y, 3.5, n=10), 3))
+    # gota de pigmento
+    drop = [(185, -175), (205, -140), (208, -122), (198, -105), (185, -100), (172, -105), (162, -122), (165, -140), (185, -175)]
+    S.append((catmull(drop[:-1], closed=True), 5))
+    return [(blob(0, 15, 235, 21), CLAY_SOFT), (fill, CLAY), (catmull(drop[:-1], closed=True), CLAY)], S
+def icon_sun_drop():
+    S = [(circle(-60, -40, 75), 6)]
+    for k in range(10):
+        ang = k / 10 * 2 * math.pi; S.append(([(-60 + 100 * math.cos(ang), -40 + 100 * math.sin(ang)), (-60 + 135 * math.cos(ang), -40 + 135 * math.sin(ang))], 5))
+    S.append((circle(-60, -40, 205, n=120)[10:50], 0))  # (guia invisível)
+    S = [x for x in S if x[1] > 0]
+    S.append(([(-205, -185), (85, 105)], 7))  # risco "evitar o sol"
+    drop = [(150, 40), (185, 105), (190, 135), (175, 165), (150, 175), (125, 165), (110, 135), (115, 105)]
+    S.append((catmull(drop, closed=True), 6))
+    return [(blob(0, 0, 235, 22), CLAY_SOFT), (circle(-60, -40, 75), (245, 214, 170)), (catmull(drop, closed=True), CLAY)], S
+def icon_hourglass():
+    S = [([(-130, -190), (130, -190)], 7), ([(-130, 190), (130, 190)], 7),
+         (catmull([(-105, -190), (-95, -90), (-20, -10), (-95, 90), (-105, 190)], closed=False), 6),
+         (catmull([(105, -190), (95, -90), (20, -10), (95, 90), (105, 190)], closed=False), 6),
+         (star_pts(185, -150, 24), 4)]
+    sand_top = [(-80, -110), (80, -110), (15, -25), (-15, -25)]
+    sand_bot = [(-90, 185), (90, 185), (50, 120), (0, 95), (-50, 120)]
+    return [(blob(0, 0, 235, 23), CLAY_SOFT), (sand_top, CLAY), (sand_bot, CLAY)], S
+
+if os.environ.get("STORY") == "micro":
+    DUR = 32.0
+    slides = [
+     dict(t0=0.0, t1=3.8, th=DARK, kicker="Nuevo en BBLips", title="Micropigmentación\nlabial", tsize=86, icon=icon_lips_dots),
+     dict(t0=3.8, t1=8.6, th=LIGHT, title="¿Qué es?", sub="Pigmento en la capa más superficial\nde la piel para dar color, definición\ny vida a tus labios.", icon=icon_lips_dots),
+     dict(t0=8.6, t1=13.8, th=LIGHT, title="Beneficios", sub="•  Color uniforme y natural\n•  Contorno más definido\n•  Efecto más jugoso\n•  Te levantas lista", icon=icon_sparkle),
+     dict(t0=13.8, t1=19.0, th=LIGHT, title="El proceso", sub="1.  Diseño y color a tu medida\n2.  Anestesia tópica\n3.  Pigmentación, con calma y precisión", icon=icon_heart),
+     dict(t0=19.0, t1=24.2, th=LIGHT, title="Cuidados", sub="Los primeros días el color es más\nintenso. Hidrata los labios y\nevita el sol.", icon=icon_sun_drop),
+     dict(t0=24.2, t1=28.4, th=DARK, kicker="Duración", title="De 1 a 3 años", sub="Con un retoque a las 4–6 semanas.", icon=icon_hourglass),
+     dict(t0=28.4, t1=DUR, th=LIGHT, end=True),
+    ]
 if os.environ.get("STORY") == "v4":
     # Versão com a narração gravada (47,3 s) — tempos seguem a fala
     DUR = 47.3
@@ -289,7 +333,8 @@ def build(s, idx):
     y = 330
     if s.get("kicker"):
         it, _ = layout_words(s["kicker"].upper(), KF, MX, y, 40); render_words(it, th["accent"]); s["kick"] = it; y += 70
-    it, y = layout_words(s["title"], TF, MX, y, 124); render_words(it, th["ink"]); s["words"] = it
+    tf = serif(s["tsize"], 450) if s.get("tsize") else TF
+    it, y = layout_words(s["title"], tf, MX, y, int(tf.size * 1.19)); render_words(it, th["ink"]); s["words"] = it
     s["title_end"] = 0.15 + len(it) * 0.09 + 0.25
     if s.get("sub"):
         it2, y = layout_words(s["sub"], SUBF, MX, y + 30, 56); render_words(it2, th["gray"]); s["subw"] = it2
