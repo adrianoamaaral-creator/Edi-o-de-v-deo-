@@ -68,8 +68,8 @@ y6(){ echo "$M6" | python3 -c "import json,sys;print(json.load(sys.stdin)['$1'])
 ffmpeg -v error -y -i "$AW/tight.wav" -af "$VCH,loudnorm=I=-14:TP=-1.5:LRA=9:measured_I=$(y6 input_i):measured_TP=$(y6 input_tp):measured_LRA=$(y6 input_lra):measured_thresh=$(y6 input_thresh):offset=$(y6 target_offset):linear=true" -ar 44100 -ac 2 "$AW/voice.wav"
 DUR6=$(DUR_ONLY=1 STORY=v4 TIMEMAP="$AW/map.json" python3 -I "$R/tools/claude_style.py" "$FD" -)
 python3 -I "$R/tools/make_music.py" "$DUR6" "$AW/music.wav" >/dev/null
-# música bem baixinha (~-31 LUFS) e abaixando quando há voz
-ffmpeg -v error -y -i "$AW/voice.wav" -i "$AW/music.wav" -filter_complex "[1:a]volume=-19dB[m];[0:a]apad,asplit=2[v][sc];[m][sc]sidechaincompress=threshold=0.02:ratio=4:attack=30:release=600[md];[v][md]amix=inputs=2:duration=longest:normalize=0,alimiter=limit=0.89" -t "$DUR6" "$AW/mix.wav"
+# música suave (~-24 LUFS), abaixando levemente quando há voz
+ffmpeg -v error -y -i "$AW/voice.wav" -i "$AW/music.wav" -filter_complex "[1:a]volume=-11dB[m];[0:a]apad,asplit=2[v][sc];[m][sc]sidechaincompress=threshold=0.03:ratio=2.5:attack=40:release=700[md];[v][md]amix=inputs=2:duration=longest:normalize=0,alimiter=limit=0.89" -t "$DUR6" "$AW/mix.wav"
 STORY=v4 TIMEMAP="$AW/map.json" python3 -I "$R/tools/claude_style.py" "$FD" - 2>/dev/null | ffmpeg -v error -y -f rawvideo -pix_fmt rgb24 -s 1080x1920 -r 30 -i - -i "$AW/mix.wav" -map 0:v -map 1:a -c:v libx264 -preset slow -crf 24 -pix_fmt yuv420p -tune animation -c:a aac -b:a 160k -movflags +faststart -t "$DUR6" "$R/output/BB_Labios_Surco_Narracion_Musica.mp4"
 
 rm -rf "$AW"
