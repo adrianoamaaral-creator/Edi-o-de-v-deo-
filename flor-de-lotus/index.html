@@ -104,7 +104,7 @@ footer .social svg{width:20px;height:20px}
 
   <a class="btn" id="catalogo" href="#" target="_blank" rel="noopener">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 5a2 2 0 0 1 2-2h12v18H6a2 2 0 0 1-2-2z"/><path d="M8 7h6M8 11h6"/></svg>
-    <span>Nosso catálogo<small>Veja modelos de vestidos e trajes</small></span>
+    <span>Nosso catálogo<small>Veja os modelos no catálogo do WhatsApp</small></span>
     <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg>
   </a>
 
@@ -171,11 +171,11 @@ footer .social svg{width:20px;height:20px}
    DADOS DA LOJA — troque os valores abaixo
    ===================================================================== */
 const LOJA = {
-  whatsapp:  "5561992551874",              // só números: 55 + DDD + número
+  whatsapp:  "556192551874",               // mesmo formato do link do catálogo do WhatsApp              // só números: 55 + DDD + número
   telefone:  "(61) 99255-1874",            // como aparece na tela
   endereco:  "",                           // ex.: "Rua X, 123 – Bairro, Brasília/DF" (vazio = botão escondido)
-  mapa:      "",                           // link do Google Maps (opcional)
-  catalogo:  "https://claude.ai/artifact/1quXFLichjbEL3P2bGHyzv",
+  mapa:      "https://maps.app.goo.gl/Z8nqTx3n5kTgxA7C6",
+  catalogo:  "https://wa.me/c/556192551874",
   instagram: "",                           // ex.: "https://instagram.com/flordelotus" (vazio = escondido)
   horario:   ""                            // ex.: "Seg a Sex 9h–18h · Sáb 9h–13h" (vazio = escondido)
 };
@@ -188,7 +188,7 @@ const $ = id => document.getElementById(id);
 $("catalogo").href = LOJA.catalogo;
 if (!LOJA.endereco && !LOJA.mapa) $("mapa").remove(); else
 $("mapa").href = LOJA.mapa || "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(LOJA.endereco);
-if ($("endereco")) $("endereco").textContent = LOJA.endereco || "Ver no mapa";
+if ($("endereco")) $("endereco").textContent = LOJA.endereco || "Ver localização no mapa";
 $("telefone").href = "tel:+" + LOJA.telefone.replace(/\D/g, "").replace(/^(?!55)/, "55");
 $("telefoneTxt").textContent = LOJA.telefone;
 if (LOJA.instagram) $("instagram").href = LOJA.instagram; else $("instagram").closest(".social").remove();
