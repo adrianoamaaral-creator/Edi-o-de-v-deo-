@@ -31,7 +31,9 @@ def lerp(a, b, k): return a + (b - a) * k
 # ---------- primitivas ----------
 def fs(c, color, lw=7, alpha=1.0):
     """preenche e contorna o caminho atual"""
-    c.set_source_rgba(*color, alpha); c.fill_preserve()
+    if isinstance(color, cairo.Pattern): c.set_source(color)
+    else: c.set_source_rgba(*color, alpha)
+    c.fill_preserve()
     c.set_source_rgba(*OL, alpha); c.set_line_width(lw); c.set_line_join(cairo.LINE_JOIN_ROUND); c.stroke()
 def line(c, pts, lw=7, color=OL):
     c.move_to(*pts[0]); [c.line_to(*p) for p in pts[1:]]
@@ -79,7 +81,19 @@ def person(c, x, y, s, t, P):
     c.translate(0, breath * .3)
     # cabelo de trás
     hy = -720 + breath * .4
-    if P["hair_back"] if "hair_back" in P else True:
+    sidestyle = P.get("style") == "side"
+    if P.get("hair_grad"):   # mechas: raiz mais escura clareando até as pontas
+        hg = cairo.LinearGradient(0, hy - 190, 0, -120)
+        for st, col in zip((0, .22, .5, 1), P["hair_grad"]): hg.add_color_stop_rgb(st, *rgb(col))
+        P["hair"] = hg
+    if sidestyle:   # cabelo longo ondulado, mais volume do lado esquerdo da tela
+        c.move_to(0, hy - 190); c.curve_to(-150, hy - 190, -225, hy - 80, -218, hy + 60)
+        for i in range(5):
+            y0 = hy + 60 + i * 95; c.curve_to(-250, y0 + 30, -195, y0 + 60, -225, y0 + 95)
+        c.curve_to(-235, -150, -150, -130, -90, -170); c.line_to(150, -440)
+        c.curve_to(205, -470, 200, hy + 100, 190, hy); c.curve_to(195, hy - 120, 120, hy - 190, 0, hy - 190); c.close_path()
+        fs(c, P["hair"])
+    else:
         rrect(c, -192, hy - 120, 384, 400, 150); fs(c, P["hair"])
     # corpo (vestido/blusa)
     c.move_to(-95, -520); c.line_to(95, -520); c.line_to(150, -215); c.line_to(-150, -215); c.close_path()
@@ -87,7 +101,10 @@ def person(c, x, y, s, t, P):
     if P["coat"]:   # jaleco branco com lapelas
         c.move_to(-105, -525); c.line_to(105, -525); c.line_to(160, -200); c.line_to(-160, -200); c.close_path(); fs(c, WHITE)
         c.move_to(-40, -525); c.line_to(0, -430); c.line_to(40, -525); c.close_path(); fs(c, P["top"], 5)
-        line(c, [(0, -430), (0, -205)], 5); c.arc(-90, -330, 0, 0, 1)
+        line(c, [(0, -430), (0, -205)], 5)
+        if P.get("necklace"):
+            c.move_to(-34, -522); c.curve_to(-20, -478, 20, -478, 34, -522); c.set_source_rgb(*rgb("e8e4ee")); c.set_line_width(3); c.stroke()
+            sparkle(c, 0, -470, 12, 0, rgb("f4f0ff"))
         rrect(c, 55, -330, 60, 50, 8); fs(c, WHITE, 5)
         for yy in (-380, -320, -260): ellipse(c, -18, yy, 7, 7); fs(c, rgb("d8d0d8"), 3)
     # braços
@@ -100,15 +117,37 @@ def person(c, x, y, s, t, P):
         if P["item"] and side == 1:
             c.save(); c.translate(0, 215); P["item"](c, t); c.restore()
         c.restore()
+    if sidestyle:   # mecha caindo pela frente do ombro
+        c.move_to(-200, hy + 40)
+        for i in range(5):
+            y0 = hy + 40 + i * 100; c.curve_to(-232, y0 + 30, -178, y0 + 65, -210, y0 + 100)
+        c.curve_to(-205, -140, -150, -110, -120, -160)
+        for i in range(5):
+            y0 = -160 - i * 100; c.curve_to(-90, y0 - 30, -140, y0 - 65, -105, y0 - 100)
+        c.close_path(); fs(c, P["hair"])
+        for i in range(3):   # fios / ondas
+            x0 = -185 + i * 25; c.move_to(x0, hy + 120 + i * 40)
+            for j in range(3): y0 = hy + 120 + i * 40 + j * 110; c.curve_to(x0 - 20, y0 + 35, x0 + 20, y0 + 70, x0, y0 + 110)
+            c.set_source_rgba(1, 1, 1, .35); c.set_line_width(6); c.stroke()
     # pescoço + cabeça
     rrect(c, -32, -570, 64, 70, 20); fs(c, P["skin"])
     ellipse(c, 0, hy, 172, 178); fs(c, P["skin"])
-    ellipse(c, -178, hy + 15, 26, 36); fs(c, P["skin"]); ellipse(c, 178, hy + 15, 26, 36); fs(c, P["skin"])
+    if not sidestyle: ellipse(c, -178, hy + 15, 26, 36); fs(c, P["skin"])   # no penteado de lado o cabelo cobre essa orelha
+    ellipse(c, 178, hy + 15, 26, 36); fs(c, P["skin"])
+    if P.get("earring"):
+        sparkle(c, 182, hy + 52, 16, 0, WHITE); ellipse(c, 182, hy + 52, 6, 6); c.set_source_rgb(*rgb("d8e8f0")); c.fill()
     face(c, 0, hy, t, P)
-    # franja
-    c.move_to(-180, hy + 10); c.curve_to(-195, hy - 230, 195, hy - 230, 180, hy + 10)
-    c.curve_to(150, hy - 80, 60, hy - 120, 10, hy - 85); c.curve_to(-50, hy - 125, -150, hy - 90, -180, hy + 10)
-    c.close_path(); fs(c, P["hair"])
+    if sidestyle:   # repartido de lado: franja varrida para a esquerda da tela, cobrindo a orelha
+        c.move_to(55, hy - 182); c.curve_to(-70, hy - 195, -205, hy - 130, -210, hy + 70)
+        c.curve_to(-180, hy + 20, -150, hy - 70, -95, hy - 105); c.curve_to(-40, hy - 135, 20, hy - 130, 55, hy - 182); c.close_path(); fs(c, P["hair"])
+        c.move_to(55, hy - 182); c.curve_to(140, hy - 175, 188, hy - 110, 186, hy - 10)
+        c.curve_to(170, hy - 80, 135, hy - 135, 62, hy - 150); c.close_path(); fs(c, P["hair"])
+        c.move_to(-20, hy - 170); c.curve_to(-110, hy - 150, -170, hy - 80, -185, hy + 20)
+        c.set_source_rgba(1, 1, 1, .35); c.set_line_width(6); c.stroke()
+    else:
+        c.move_to(-180, hy + 10); c.curve_to(-195, hy - 230, 195, hy - 230, 180, hy + 10)
+        c.curve_to(150, hy - 80, 60, hy - 120, 10, hy - 85); c.curve_to(-50, hy - 125, -150, hy - 90, -180, hy + 10)
+        c.close_path(); fs(c, P["hair"])
     if P["bow"]:
         c.save(); c.translate(120, hy - 150); c.rotate(.4)
         for sd in (-1, 1): c.move_to(0, 0); c.line_to(sd * 60, -35); c.line_to(sd * 60, 35); c.close_path(); fs(c, P["bow"], 6)
@@ -136,7 +175,13 @@ def face(c, x, y, t, P):
         # sobrancelhas
         bh = {"scared": -85, "wow": -88, "happy": -80, "sad": -70}.get(e, -74)
         tilt = {"scared": 18, "sad": 16, "angry": -16}.get(e, 0)
-        line(c, [(ex - sd * 30, ey + bh - tilt), (ex + sd * 28, ey + bh + tilt * .3)], 9)
+        line(c, [(ex - sd * 30, ey + bh - tilt), (ex + sd * 28, ey + bh + tilt * .3)], P.get("brow_w", 9), P.get("brow", OL))
+        if P.get("liner") and ry > 12:   # delineado gatinho
+            c.new_path(); c.save(); c.translate(ex, ey); c.scale(50, ry)
+            c.arc(0, 0, 1, math.pi * 1.05, math.pi * 1.95); c.restore()
+            c.set_source_rgb(*OL); c.set_line_width(11); c.stroke()
+            c.move_to(ex + sd * 46, ey - ry * .35); c.line_to(ex + sd * 74, ey - ry * .75); c.line_to(ex + sd * 48, ey - ry * .1); c.close_path()
+            c.set_source_rgb(*OL); c.fill()
     # bochechas
     for sd in (-1, 1): ellipse(c, x + sd * 108, y + 70, 30, 18); c.set_source_rgba(*PINK, .7); c.fill()
     my = y + 98
@@ -216,8 +261,10 @@ def sunburst(c, t, c1, c2, cx=W / 2, cy=900):
     c.set_source(rg); c.paint()
 
 # ---------- elenco ----------
-LUCIA = dict(hair=rgb("e0a040"), top=rgb("f08ca0"), iris=rgb("4f8fd6"), bow=rgb("ff6f91"), seed=3)
-BRUNA = dict(hair=rgb("3a2420"), top=rgb("c0566e"), coat=True, iris=rgb("7a5230"), skin=rgb("eab894"), seed=7)
+LUCIA = dict(hair=rgb("8b4a2b"), top=rgb("f08ca0"), iris=rgb("4f8fd6"), bow=rgb("ff6f91"), seed=3)
+BRUNA = dict(style="side", hair_grad=("7a5d42", "b48f5c", "e3c890", "f2e0b0"), top=rgb("c0566e"), coat=True,
+             iris=rgb("6fa6b0"), skin=rgb("f3cdb2"), liner=True, earring=True, necklace=True,
+             brow=rgb("6b4f3a"), brow_w=8, seed=7)
 
 # ---------- cenas (cada uma recebe o tempo local) ----------
 def cam(c, zoom, cx=W / 2, cy=H / 2, dx=0, dy=0):
