@@ -1,13 +1,13 @@
 """Curta animado com bonecos (estilo cartoon vetorial) — história da Lucía e o Hyaluron Pen.
 Uso: python3 tools/cartoon.py video | ffmpeg -f rawvideo -pix_fmt bgra -s 1080x1920 -r 30 -i - ...
-     python3 tools/cartoon.py audio saida.wav        (trilha + efeitos sincronizados)
+     python3 tools/cartoon.py audio saida.wav        (trilha + efeitos sincronizados; a voz é mixada no ffmpeg)
      python3 tools/cartoon.py preview DIR 1.0 5.2 ...
 Requer: pip install pycairo numpy pillow"""
 import sys, math, random, os, wave
 import cairo, numpy as np
 from PIL import Image
 
-W, H, FPS, DUR = 1080, 1920, 30, 24.5
+W, H, FPS, DUR = 1080, 1920, 30, 23.3
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 LOGO = os.path.join(ROOT, "assets", "logo_bblips_mask.png")
 LOGO_SURF = cairo.ImageSurface.create_from_png(LOGO) if os.path.exists(LOGO) else None
@@ -270,7 +270,7 @@ BRUNA = dict(style="side", hair_grad=("7a5d42", "b48f5c", "e3c890", "f2e0b0"), t
 def cam(c, zoom, cx=W / 2, cy=H / 2, dx=0, dy=0):
     c.translate(cx + dx, cy + dy); c.scale(zoom, zoom); c.translate(-cx, -cy)
 
-def s1_home(c, t):          # 0 – 4.5
+def s1_home(c, t):          # 0 – T_FEAR
     c.save(); cam(c, 1 + t * .025, cy=1100)
     bricks(c, rgb("e8a598"), rgb("c47f74")); floor(c, rgb("b8865a"))
     window(c, 640, 260, 300, 340, rgb("ffe3a3")); sparkle(c, 790, 330, 26, t, WHITE, .8)
@@ -291,7 +291,7 @@ def s1_home(c, t):          # 0 – 4.5
         c.restore()
     c.restore()
 
-def s2_fear(c, t):          # 4.5 – 9
+def s2_fear(c, t):          # T_FEAR – T_CLINIC
     c.set_source_rgb(*rgb("2a2238")); c.paint()
     rg = cairo.RadialGradient(400, 1400, 50, 400, 1400, 900); rg.add_color_stop_rgba(0, 1, .9, .7, .35); rg.add_color_stop_rgba(1, 1, .9, .7, 0)
     c.set_source(rg); c.paint()
@@ -326,7 +326,7 @@ def clinic_bg(c, t):
         c.save(); c.translate(960, 1380); c.rotate(a + math.sin(t * 1.5 + a) * .04); ellipse(c, 0, -120, 34, 110); fs(c, rgb("7cc58a"), 6); c.restore()
     rrect(c, 900, 1360, 120, 140, 16); fs(c, rgb("f6c9a8"), 7)
 
-def s3_clinic(c, t):        # 9 – 13.5
+def s3_clinic(c, t):        # T_CLINIC – T_LIPS
     c.save(); cam(c, 1.02 + t * .015, cy=1200)
     clinic_bg(c, t)
     k = out_cubic(prog(t, .1, 1.6)); bx = lerp(W + 250, 760, k)
@@ -344,7 +344,7 @@ def s3_clinic(c, t):        # 9 – 13.5
             if kk > 0: sparkle(c, 640 + math.cos(i * 1.7) * 140, 980 + math.sin(i * 2.3) * 120, 34 * kk, t * 2 + i, YELLOW)
     c.restore()
 
-def s4_lips(c, t):          # 13.5 – 18
+def s4_lips(c, t):          # T_LIPS – T_HAPPY
     c.set_source_rgb(*rgb("f7d9df")); c.paint()
     rg = cairo.RadialGradient(W / 2, 900, 0, W / 2, 900, 800); rg.add_color_stop_rgba(0, 1, 1, 1, .7); rg.add_color_stop_rgba(1, 1, 1, 1, 0)
     c.set_source(rg); c.paint()
@@ -383,7 +383,7 @@ def s4_lips(c, t):          # 13.5 – 18
     px = lerp(W + 400, W / 2 + tx + 305, k) + away * 700; py = lerp(100, 1040 + ty * .85 - 305, k) - hop - away * 500
     c.save(); c.translate(px, py); c.rotate(1.685); pen(c, t, 1.8); c.restore()
 
-def s5_happy(c, t):         # 18 – 21.5
+def s5_happy(c, t):         # T_HAPPY – T_END
     sunburst(c, t, rgb("ffb3c6"), rgb("ff9bb5"))
     jump = abs(math.sin(t * 5.2)) * 120 if t > .3 else 0
     sq = 1 - .06 * max(0, math.cos(t * 5.2 * 2)) if t > .3 else 1
@@ -402,7 +402,7 @@ def s5_happy(c, t):         # 18 – 21.5
     for i in range(3):
         sparkle(c, 200 + i * 340, 420 + (i % 2) * 120, 50 * (1 + .2 * math.sin(t * 6 + i)), t + i, WHITE)
 
-def s6_end(c, t):           # 21.5 – 24.5
+def s6_end(c, t):           # T_END – fim
     c.set_source_rgb(*rgb("fbe4e6")); c.paint()
     sunburst(c, t * .5, rgb("fbe4e6"), rgb("f8d6dc"), cy=700)
     k = out_elastic(prog(t, .1, 1.0))
@@ -422,19 +422,40 @@ def s6_end(c, t):           # 21.5 – 24.5
         person(c, x, y, .78, t + i, dict(P, expr="happy", look=(.3 if i == 0 else -.3, .2), armR=wave if i == 0 else 1.0,
                                            armL=.2 if i == 0 else wave, item=None))
 
-SCENES = [(0, 4.5, s1_home), (4.5, 9.0, s2_fear), (9.0, 13.5, s3_clinic), (13.5, 18.0, s4_lips), (18.0, 21.5, s5_happy), (21.5, DUR, s6_end)]
-WHIPS = {9.0, 18.0, 21.5}         # transições em chicote; as outras são corte seco com "punch"
+# cortes alinhados às pausas da narração gravada (assets/narracion_cartoon_lucia.m4a)
+T_FEAR, T_CLINIC, T_LIPS, T_HAPPY, T_END = 4.3, 7.5, 11.6, 15.95, 18.85
+SCENES = [(0, T_FEAR, s1_home), (T_FEAR, T_CLINIC, s2_fear), (T_CLINIC, T_LIPS, s3_clinic), (T_LIPS, T_HAPPY, s4_lips),
+          (T_HAPPY, T_END, s5_happy), (T_END, DUR, s6_end)]
+WHIPS = {T_CLINIC, T_HAPPY, T_END}   # transições em chicote; as outras são corte seco com "punch"
 
 # ---------- legendas ----------
-CAPS = [(.4, 2.1, "Lucía soñaba con"), (2.1, 4.4, "unos labios con *más volumen*"),
-        (4.7, 6.3, "pero le daban"), (6.3, 8.9, "*pánico* las agujas"),
-        (9.3, 11.2, "Hasta que Bruna"), (11.2, 13.4, "le presentó el *Hyaluron Pen*"),
-        (13.8, 15.7, "*Sin agujas.*"), (15.7, 17.9, "Volumen sutil y *natural*"),
-        (18.3, 21.3, "¡Y ahora no para de *sonreír!*")]
+# trechos de fala (início, fim em segundos, medidos pelas pausas do áudio) — o tempo de cada palavra é repartido pelo tamanho
+SPEECH = [(.50, 3.55, "Lucía soñaba con unos labios con más volumen"), (4.42, 4.73, "pero"), (5.31, 7.31, "le daban pánico las agujas"),
+          (7.65, 10.01, "Hasta que Bruna le presentó"), (10.36, 11.22, "el Hyaluron Pen"), (12.02, 12.95, "Sin agujas"),
+          (13.62, 14.62, "Volumen sutil"), (15.05, 15.84, "y natural"), (16.12, 18.49, "Y ahora no para de sonreír")]
+CHUNKS = ["Lucía soñaba con", "unos labios con *más volumen*", "pero le daban", "*pánico* las agujas", "Hasta que Bruna",
+          "le presentó el *Hyaluron Pen*", "*Sin agujas.*", "Volumen sutil y *natural*", "¡Y ahora no para de *sonreír!*"]
+def _word_times():
+    out = []
+    for a, b, txt in SPEECH:
+        ws = txt.split(); wt = [len(w) + 2 for w in ws]; acc = a
+        for w, k in zip(ws, wt): out.append(acc); acc += (b - a) * k / sum(wt)
+    return out
+WORD_T = _word_times()
+CAPS = []   # (início, fim, texto, tempos das palavras)
+_i = 0
+for _n, _ch in enumerate(CHUNKS):
+    _n_w = len(_ch.split()); _ts = WORD_T[_i:_i + _n_w]; _i += _n_w
+    CAPS.append([_ts[0] - .05, None, _ch, _ts])
+for _n, cp in enumerate(CAPS):
+    seg_end = next(b for a, b, _ in SPEECH if a <= cp[3][-1] <= b)
+    nxt = CAPS[_n + 1][0] if _n + 1 < len(CAPS) else 99
+    cp[1] = min(nxt, seg_end + .6) if nxt - seg_end > .8 else nxt
+    cp[1] = min(cp[1], T_END - .25)   # tela final sem legenda (o botão já diz «Reserva tu cita»)
 def font(c, size): c.select_font_face("Inter", cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD); c.set_font_size(size)
 def tw(c, s): return c.text_extents(s).x_advance
 def captions(c, t):
-    for a, b, text in CAPS:
+    for a, b, text, wts in CAPS:
         if not (a <= t < b): continue
         toks, hl = [], False
         for w in text.split(" "):
@@ -452,7 +473,7 @@ def captions(c, t):
         for ln, lw in lines:
             x = W / 2 - lw / 2
             for i, w, h, ww in ln:
-                k = out_back(prog(t, a + i * .1, a + i * .1 + .25), 2.2)
+                k = out_back(prog(t, wts[i] - .05, wts[i] + .2), 2.2)
                 if k > 0:
                     c.save(); c.translate(x + ww / 2, y - 30); c.scale(k, k); c.translate(-ww / 2, 30)
                     c.move_to(0, 0); c.text_path(w)
@@ -488,7 +509,7 @@ def frame(t):
         global _KEEP; _KEEP = arr          # mantém o buffer vivo
     else:
         a, fn = scene_at(t)
-        punch = 1 + .06 * (1 - out_cubic(prog(t - a, 0, .3))) if a in (4.5, 13.5) else 1   # "soco" de zoom no corte
+        punch = 1 + .06 * (1 - out_cubic(prog(t - a, 0, .3))) if a in (T_FEAR, T_LIPS) else 1   # "soco" de zoom no corte
         c.save(); cam(c, punch); fn(c, t - a); c.restore()
     captions(c, t)
     fo = max(1 - prog(t, 0, .3), prog(t, DUR - .4, DUR))
@@ -512,8 +533,8 @@ def audio(path):
     t0 = 0.0; b = 0
     while t0 < DUR - .5:
         ch = prog_[(b // 4) % 4]
-        if (b // 4) * 4 * beat < 4.5 or True:
-            dark = 4.5 <= t0 < 9.0                  # na cena do medo a música fica tensa (só baixo pulsando)
+        if True:
+            dark = T_FEAR <= t0 < T_CLINIC                  # na cena do medo a música fica tensa (só baixo pulsando)
             add(pluck(ch[0] - 24, .5, .3), t0, .5, .22)
             if not dark:
                 for j, m in enumerate(ch): add(pluck(m, .45, .6), t0 + beat / 2, .3 + .2 * j, .07)
@@ -522,6 +543,7 @@ def audio(path):
             else:
                 add(pluck(ch[0] - 23, .3, .2), t0 + beat / 2, .5, .15)
         t0 += beat; b += 1
+    L *= .45; R *= .45   # música mais baixa por baixo da voz
     def whoosh(d=.45):
         m = int(d * SR); x = rng.standard_normal(m); env = np.sin(np.linspace(0, np.pi, m)) ** 2
         y = np.convolve(x, np.ones(12) / 12, "same"); return y * env
@@ -532,17 +554,16 @@ def audio(path):
     def boing(d=.4):
         tt = np.arange(int(d * SR)) / SR; f = 220 + 160 * np.sin(tt * 40) * np.exp(-tt * 6); return np.sin(2 * np.pi * np.cumsum(f) / SR) * np.exp(-tt * 6)
     for w in sorted(WHIPS): add(whoosh(), w - .22, .5, .35)
-    for a, b_, text in CAPS:
-        for i, _ in enumerate(text.split(" ")): add(pop(1100 + 80 * i), a + i * .1, .5, .05)
-    add(boing(), 4.5 + .7, .7, .3)                                  # seringa chegando
-    tt = np.arange(int(1.6 * SR)) / SR; add(np.sin(2 * np.pi * (60 + 20 * tt) * tt) * np.exp(-tt * 2), 4.5 + 1.0, .5, .25)  # susto grave
-    for i in range(4): add(chime(1568 * 2 ** (i / 12 * 3)), 9.0 + 2.7 + i * .12, .3 + i * .15, .08)
+    for wt in WORD_T: add(pop(1300), wt, .5, .015)
+    add(boing(), T_FEAR + .7, .7, .3)                                  # seringa chegando
+    tt = np.arange(int(1.6 * SR)) / SR; add(np.sin(2 * np.pi * (60 + 20 * tt) * tt) * np.exp(-tt * 2), T_FEAR + 1.0, .5, .25)  # susto grave
+    for i in range(4): add(chime(1568 * 2 ** (i / 12 * 3)), T_CLINIC + 2.7 + i * .12, .3 + i * .15, .08)
     for t_ in (.9, 1.6, 2.3):
-        m = int(.25 * SR); add(np.convolve(rng.standard_normal(m), np.ones(4) / 4, "same") * np.exp(-np.arange(m) / SR * 18), 13.5 + t_, .5, .12)  # "pff" da caneta
-        add(pop(500, .15), 13.5 + t_ + .05, .5, .1)
-    for i in range(6): add(chime(2093 * 2 ** (i / 12 * 2)), 13.5 + 2.6 + i * .1, .2 + i * .12, .06)
-    for j in range(5): add(boing(.3), 18.3 + j * (math.pi / 5.2), .5, .12)
-    add(chime(1046, 1.6), 21.6, .5, .15); add(chime(1318, 1.6), 21.7, .5, .12)
+        m = int(.25 * SR); add(np.convolve(rng.standard_normal(m), np.ones(4) / 4, "same") * np.exp(-np.arange(m) / SR * 18), T_LIPS + t_, .5, .12)  # "pff" da caneta
+        add(pop(500, .15), T_LIPS + t_ + .05, .5, .1)
+    for i in range(6): add(chime(2093 * 2 ** (i / 12 * 2)), T_LIPS + 2.6 + i * .1, .2 + i * .12, .06)
+    for j in range(5): add(boing(.3), T_HAPPY + .3 + j * (math.pi / 5.2), .5, .12)
+    add(chime(1046, 1.6), T_END + .1, .5, .15); add(chime(1318, 1.6), T_END + .2, .5, .12)
     mix = np.stack([L, R], 1); mix *= .9 / max(1e-6, np.abs(mix).max())
     fade = np.minimum(1, (n - np.arange(n)) / (SR * .8)); mix *= fade[:, None]
     with wave.open(path, "wb") as wf:
