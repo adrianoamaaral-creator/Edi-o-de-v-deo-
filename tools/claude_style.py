@@ -228,6 +228,18 @@ if os.environ.get("STORY") == "micro":
      dict(t0=24.2, t1=28.4, th=DARK, kicker="Duración", title="De 1 a 3 años", sub="Con un retoque a las 4–6 semanas.", icon=icon_hourglass),
      dict(t0=28.4, t1=DUR, th=LIGHT, end=True),
     ]
+
+if os.environ.get("STORY") == "hidragloss":
+    DUR = 30.0
+    slides = [
+     dict(t0=0.0, t1=3.6, th=DARK, kicker="Tratamiento", title="Hidragloss", sub="Labios hidratados, con glow.", icon=icon_final),
+     dict(t0=3.6, t1=7.4, th=LIGHT, title="Esto es lo que\npuede hacer por\ntus labios.", icon=icon_lips_dots),
+     dict(t0=7.4, t1=21.6, th=LIGHT, kicker="Hidragloss", title="Sus beneficios", photo="hidragloss/labios_limpio.png", photo_w=860,
+          items=[(1.4, "Da glow y volumen natural"), (3.4, "Mejora la textura"), (5.4, "Hidratación profunda"),
+                 (7.4, "Disminuye pliegues y arruguitas"), (9.4, "Estimula el colágeno"), (11.4, "Rejuvenece los labios")]),
+     dict(t0=21.6, t1=25.6, th=LIGHT, title="Tus labios y\ntu bienestar.", sub="Un cuidado que se nota.", icon=icon_heart),
+     dict(t0=25.6, t1=DUR, th=LIGHT, end=True),
+    ]
 if os.environ.get("STORY") == "v4":
     # Versão com a narração gravada (47,3 s) — tempos seguem a fala
     DUR = 47.3
@@ -347,7 +359,15 @@ def build(s, idx):
         d.rounded_rectangle((16, 16, PW + 16, PH + 16), radius=22, fill=th["accent"] + (255,))
         card.alpha_composite(ph_, (4, 4))
         d.line([(4 + x, 4 + y) for x, y in wobble(resample(rect(0, 0, PW, PH)), 1.4, 9)], fill=th["line"] + (255,), width=3, joint="curve")
-        s["photo_img"] = card; s["photo_y"] = s.get("photo_y", y + 50); return
+        s["photo_img"] = card; s["photo_y"] = s.get("photo_y", y + 50)
+        if s.get("items"):   # lista de benefícios que aparece item a item abaixo da foto
+            ly = s["photo_y"] + card.height + 40; s["items_r"] = []
+            for t, txt in s["items"]:
+                im = Image.new("RGBA", (W - 2 * MX, 60), (0, 0, 0, 0)); d = ImageDraw.Draw(im)
+                pts = star_pts(0, 0, 13); d.polygon([(18 + x, 27 + y_) for x, y_ in pts], fill=th["accent"] + (255,))
+                d.text((50, 4), txt, font=sans(38, 450), fill=th["ink"] + (255,))
+                s["items_r"].append((t, im, ly)); ly += 64
+        return
     s["spec"] = s["icon"](); s["icy"] = 1000; s["cache"] = None
 
 def ease(x): x = min(max(x, 0), 1); return 1 - (1 - x) ** 3
@@ -433,6 +453,9 @@ def render_slide(s, lt):
         if p > 0:
             sc = 0.94 + 0.06 * p; c2 = card.resize((int(card.width * sc), int(card.height * sc)), Image.BICUBIC) if sc < 0.999 else card
             fr.alpha_composite(alpha(c2, p), ((W - c2.width) // 2, int(s["photo_y"] + (card.height - c2.height) / 2 + (1 - p) * 30)))
+        for t, im, ly in s.get("items_r", []):
+            q = ease((lt - t) / 0.45)
+            if q > 0: fr.alpha_composite(alpha(im, q), (int(MX + (1 - q) * 30), int(ly)))
         return fr
     p = min(max((lt - 0.25) / 1.1, 0), 1)
     if p >= 1:
