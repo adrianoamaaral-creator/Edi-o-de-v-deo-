@@ -4,6 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Flor de Lótus</title>
+<link rel="icon" href="logo.png">
+<meta property="og:image" content="logo.png">
 <meta name="description" content="Flor de Lótus — trajes para noiva, madrinha, formanda, convidada, noivo, padrinho, formando, convidado e pajens. Fale conosco no WhatsApp.">
 <meta property="og:title" content="Flor de Lótus">
 <meta property="og:description" content="Trajes femininos e masculinos para casamentos, formaturas e festas.">
@@ -15,21 +17,10 @@
    EDITE AQUI: dados da loja ficam no bloco <script> no final do arquivo
    ===================================================================== */
 :root{
-  --bg:#fbf6f3; --bg2:#f4e7e4; --card:#ffffff; --ink:#3b2433; --muted:#7d6573;
-  --rose:#c98b9a; --plum:#6e3a59; --gold:#b8935a; --line:#ead8d6;
-  --wa:#1f9d55; --shadow:0 6px 22px rgba(110,58,89,.10);
-}
-@media (prefers-color-scheme: dark){
-  :root:not([data-theme="light"]){
-    --bg:#1d1419; --bg2:#2a1c24; --card:#2b1f27; --ink:#f6e9ee; --muted:#c4adb9;
-    --rose:#e0a6b4; --plum:#e7b8cf; --gold:#d9b77f; --line:#3d2b36;
-    --wa:#2fb86a; --shadow:0 6px 22px rgba(0,0,0,.35);
-  }
-}
-:root[data-theme="dark"]{
-  --bg:#1d1419; --bg2:#2a1c24; --card:#2b1f27; --ink:#f6e9ee; --muted:#c4adb9;
-  --rose:#e0a6b4; --plum:#e7b8cf; --gold:#d9b77f; --line:#3d2b36;
-  --wa:#2fb86a; --shadow:0 6px 22px rgba(0,0,0,.35);
+  color-scheme:dark;
+  --bg:#0a0909; --bg2:#2a1717; --card:#151112; --ink:#f5e9e8; --muted:#b8a3a3;
+  --rose:#d98c8b; --plum:#e8a6a3; --gold:#d98c8b; --line:#33252a;
+  --wa:#1f9d55; --shadow:0 6px 22px rgba(0,0,0,.45);
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html{-webkit-text-size-adjust:100%}
@@ -41,6 +32,7 @@ body{
 }
 .wrap{max-width:460px;margin:0 auto;padding:40px 16px 48px}
 header{text-align:center;margin-bottom:28px}
+.brandlogo{display:block;width:100%;max-width:340px;height:auto;margin:0 auto 4px}
 .logo{width:96px;height:96px;margin:0 auto 14px;border-radius:50%;
   background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow);
   display:grid;place-items:center}
@@ -75,7 +67,7 @@ h2{font-family:"Cormorant Garamond",serif;font-weight:600;font-size:1.6rem;
 .group h3{font-size:.75rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);
   text-align:center;margin-bottom:12px;font-weight:600}
 .chips{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}
-.chip{display:block;text-align:center;text-decoration:none;color:var(--ink);
+.chip{display:block;text-align:center;text-decoration:none;color:var(--ink);font-weight:500;
   border:1px solid var(--line);border-radius:999px;padding:10px 8px;font-size:.9rem;
   background:var(--bg);transition:background .15s,border-color .15s}
 .chip:hover{border-color:var(--rose);background:var(--bg2)}
@@ -99,20 +91,9 @@ footer .social svg{width:20px;height:20px}
 <div class="wrap">
 
   <header>
-    <div class="logo" aria-hidden="true">
-      <!-- Pode trocar por <img src="logo.png" style="width:100%;height:100%;border-radius:50%;object-fit:cover"> -->
-      <svg viewBox="0 0 64 64" fill="none">
-        <path d="M32 12c6 7 8 15 0 30-8-15-6-23 0-30z" fill="#c98b9a"/>
-        <path d="M32 42c-3-10-11-17-21-18 2 10 9 17 21 18z" fill="#dba7b3"/>
-        <path d="M32 42c3-10 11-17 21-18-2 10-9 17-21 18z" fill="#dba7b3"/>
-        <path d="M32 42C24 36 14 35 6 38c6 6 16 7 26 4z" fill="#e9c3cb"/>
-        <path d="M32 42c8-6 18-7 26-4-6 6-16 7-26 4z" fill="#e9c3cb"/>
-        <path d="M14 48c6 3 30 3 36 0" stroke="#b8935a" stroke-width="2" stroke-linecap="round"/>
-      </svg>
-    </div>
-    <h1 id="nome">Flor de Lótus</h1>
+    <h1><img class="brandlogo" src="logo.png" alt="Flor de Lótus"></h1>
     <p class="tag">Trajes para momentos especiais</p>
-    <p class="intro">Casamentos, formaturas e festas — moda feminina e masculina para você brilhar no seu grande dia.</p>
+    <p class="intro" style="margin-top:14px">Casamentos, formaturas e festas — moda feminina e masculina para você brilhar no seu grande dia.</p>
   </header>
 
   <a class="btn wa" data-wa="Olá! Vim pelo Instagram e gostaria de atendimento." href="#">
@@ -190,13 +171,13 @@ footer .social svg{width:20px;height:20px}
    DADOS DA LOJA — troque os valores abaixo
    ===================================================================== */
 const LOJA = {
-  whatsapp:  "5500000000000",              // só números: 55 + DDD + número
-  telefone:  "(00) 0000-0000",             // como aparece na tela
-  endereco:  "Rua Exemplo, 123 – Centro, Cidade/UF",
-  mapa:      "",                           // link do Google Maps (vazio = busca pelo endereço)
-  catalogo:  "https://wa.me/c/5500000000000", // catálogo do WhatsApp Business ou outro link
-  instagram: "https://instagram.com/flordelotus",
-  horario:   "Seg a Sex 9h–18h · Sáb 9h–13h"
+  whatsapp:  "5561992551874",              // só números: 55 + DDD + número
+  telefone:  "(61) 99255-1874",            // como aparece na tela
+  endereco:  "",                           // ex.: "Rua X, 123 – Bairro, Brasília/DF" (vazio = botão escondido)
+  mapa:      "",                           // link do Google Maps (opcional)
+  catalogo:  "https://claude.ai/artifact/1quXFLichjbEL3P2bGHyzv",
+  instagram: "",                           // ex.: "https://instagram.com/flordelotus" (vazio = escondido)
+  horario:   ""                            // ex.: "Seg a Sex 9h–18h · Sáb 9h–13h" (vazio = escondido)
 };
 
 const wa = msg => "https://wa.me/" + LOJA.whatsapp + "?text=" + encodeURIComponent(msg);
@@ -205,12 +186,13 @@ document.querySelectorAll("[data-wa]").forEach(a => {
 });
 const $ = id => document.getElementById(id);
 $("catalogo").href = LOJA.catalogo;
+if (!LOJA.endereco && !LOJA.mapa) $("mapa").remove(); else
 $("mapa").href = LOJA.mapa || "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(LOJA.endereco);
-$("endereco").textContent = LOJA.endereco;
+if ($("endereco")) $("endereco").textContent = LOJA.endereco || "Ver no mapa";
 $("telefone").href = "tel:+" + LOJA.telefone.replace(/\D/g, "").replace(/^(?!55)/, "55");
 $("telefoneTxt").textContent = LOJA.telefone;
-$("instagram").href = LOJA.instagram;
-$("horario").textContent = LOJA.horario;
+if (LOJA.instagram) $("instagram").href = LOJA.instagram; else $("instagram").closest(".social").remove();
+if (LOJA.horario) $("horario").textContent = LOJA.horario; else $("horario").remove();
 $("ano").textContent = new Date().getFullYear();
 </script>
 </body>
