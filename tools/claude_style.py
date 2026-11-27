@@ -184,6 +184,18 @@ def icon_dual():
     S += [(star_pts(-150, -120, 26), 4), (star_pts(215, -60, 18), 4)]
     return [(blob(-95, 20, 140, 11), CLAY_SOFT), (blob(120, 10, 125, 12), CLAY_SOFT), (fill, CLAY)], S
 
+if os.environ.get("STORY") == "v3":
+    # Versão SEM VOZ para regravar o áudio: lábios + surco nasogeniano da mesma cliente (24 s)
+    DUR = 24.0
+    slides = [
+     dict(t0=0.0, t1=4.0, th=DARK, kicker="Sin agujas", title="Hyaluron Pen", icon=icon_pen),
+     dict(t0=4.0, t1=16.0, th=LIGHT, ba=True, imgs=("labios2/antes_recorte.png", "labios2/despues_recorte.png"),
+          pw_w=580, ph_h=446, d_start=1.4, circle=False, lips_ring=2.8, lips_ring_end=6.7, fold_rings=7.3,
+          note="Resultados reales · Los resultados pueden variar.",
+          phases=[(0.0, "Más volumen.", "Labios sutiles y naturales."), (7.0, "Y el surco\nnasogeniano.", None)]),
+     dict(t0=16.0, t1=19.5, th=LIGHT, title="Sin agujas.", sub="Volumen y armonía, sin pinchazos.", icon=icon_syringe),
+     dict(t0=19.5, t1=DUR, th=LIGHT, end=True),
+    ]
 if os.environ.get("STORY") == "v2":
     DUR = 24.0
     slides = [
@@ -289,12 +301,25 @@ def render_slide(s, lt):
             fr.alpha_composite(ov)
         if s.get("lips_ring") is not None:   # contorno à mão em volta dos lábios no "Después"
             p = min(max((lt - s["lips_ring"]) / 0.9, 0), 1)
-            if p > 0:
+            fade = 1.0
+            if s.get("lips_ring_end") is not None: fade = 1 - min(max((lt - s["lips_ring_end"]) / 0.4, 0), 1)
+            if p > 0 and fade > 0:
                 ov = Image.new("RGBA", (W, H), (0, 0, 0, 0)); d = ImageDraw.Draw(ov)
                 ecx, ecy = CX + 4 + PW / 2, Y2 + 54 + PH * 0.47
                 pts = [(ecx + PW * 0.34 * math.cos(a), ecy + PH * 0.25 * math.sin(a)) for a in [3.6 + 6.7 * i / 140 for i in range(141)]]
                 pts = wobble(pts, 2.2, 77)[:max(2, int(141 * ease(p)))]
-                d.line(pts, fill=CLAY + (255,), width=8, joint="curve"); fr.alpha_composite(ov)
+                d.line(pts, fill=CLAY + (255,), width=8, joint="curve"); fr.alpha_composite(alpha(ov, fade))
+        if s.get("fold_rings") is not None:   # marcas do surco nasogeniano (dos dois lados da boca), nas duas fotos
+            p = min(max((lt - s["fold_rings"]) / 1.0, 0), 1)
+            if p > 0:
+                ov = Image.new("RGBA", (W, H), (0, 0, 0, 0)); d = ImageDraw.Draw(ov)
+                for k, yy in enumerate((y0, Y2)):
+                    for j, fx in enumerate((0.27, 0.73)):
+                        ecx, ecy = CX + 4 + PW * fx, yy + 54 + PH * 0.36
+                        pts = [(ecx + PW * 0.075 * math.cos(a), ecy + PH * 0.22 * math.sin(a)) for a in [-1.7 + 6.7 * i / 100 for i in range(101)]]
+                        pts = wobble(pts, 1.6, 90 + k * 2 + j)[:max(2, int(101 * ease(p)))]
+                        d.line(pts, fill=CLAY + (255,), width=6, joint="curve")
+                fr.alpha_composite(ov)
         if lt > 0.6: fr.alpha_composite(alpha(s["note"], ease((lt - 0.6) / 0.5)), (0, Y2 + PH + 76))
         return fr
     if s.get("kick"): words_on(fr, s["kick"], lt, 0.0, 0.05)
