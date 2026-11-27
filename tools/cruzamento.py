@@ -172,7 +172,7 @@ def at(c, t, text, t0, t1, size, bg, fg, rot, pos, **kw):
     if t0 <= t < t1:
         paste_scaled(c, tag(text, size, bg, fg, rot, **kw), pos, pop(t, t0, 0.3), 1 - prog(t, t1 - 0.2, t1))
 
-STAMPS = {"MITO": stamp_img("MITO", RED), "REDUZ!": stamp_img("REDUZ!", RED), "PEDESTRE": stamp_img("PEDESTRE PRIMEIRO", GREEN, size=84, rot=6)}
+STAMPS = {"MITO": stamp_img("MITO", RED), "REDUZ!": stamp_img("REDUZ!", RED), "PEDESTRE": stamp_img("PEDESTRE PRIMEIRO", GREEN, size=60, rot=6)}
 
 def crossed(c, t, text, t0, t1, pos, rot):
     if not (t0 <= t < t1): return
