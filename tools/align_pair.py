@@ -8,6 +8,8 @@ PA = np.float32([(520, 311), (724, 424), (625, 365), (610, 415), (590, 160)])
 PD = np.float32([(535, 380), (812, 432), (675, 387), (675, 457), (612, 207)])
 if len(sys.argv) > 5:   # pontos do DEPOIS passados como JSON, ex.: '[[865,610],[1315,700],...]'
     import json; PD = np.float32(json.loads(sys.argv[5]))
+if len(sys.argv) > 6:   # pontos do ANTES também como JSON
+    import json; PA = np.float32(json.loads(sys.argv[6]))
 OW, OH, MOUTH = 1160, 892, 560          # tamanho do recorte e largura final da boca (px)
 a = cv2.imread(A); d = cv2.imread(D)
 # Só rotação + zoom uniforme + posição (sem esticar/inclinar), para a foto continuar natural.
