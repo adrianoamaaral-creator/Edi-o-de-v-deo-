@@ -49,3 +49,11 @@ fi
 
 # ---- Versão SEM VOZ (lábios + surco nasogeniano) para regravar o áudio ----
 STORY=v3 python3 -I "$R/tools/claude_style.py" "$FD" - | ffmpeg -v error -y -f rawvideo -pix_fmt rgb24 -s 1080x1920 -r 30 -i - -f lavfi -i anullsrc=r=44100:cl=stereo -map 0:v -map 1:a -c:v libx264 -preset slow -crf 19 -pix_fmt yuv420p -tune animation -c:a aac -b:a 128k -movflags +faststart -t 24 "$R/output/BB_Labios_Surco_SIN_AUDIO.mp4"
+
+# ---- Versão com a narração gravada (assets/narracion_labios_surco.m4a) ----
+NAR="$R/assets/narracion_labios_surco.m4a"
+PRE="highpass=f=80,afftdn=nf=-45,acompressor=threshold=-24dB:ratio=2.5:attack=10:release=200"
+M5=$(ffmpeg -hide_banner -i "$NAR" -af "$PRE,loudnorm=I=-14:TP=-1.5:LRA=11:print_format=json" -f null - 2>&1 | sed -n '/^{/,/^}/p')
+z(){ echo "$M5" | python3 -c "import json,sys;print(json.load(sys.stdin)['$1'])"; }
+LN5="loudnorm=I=-14:TP=-1.5:LRA=11:measured_I=$(z input_i):measured_TP=$(z input_tp):measured_LRA=$(z input_lra):measured_thresh=$(z input_thresh):offset=$(z target_offset):linear=true"
+STORY=v4 python3 -I "$R/tools/claude_style.py" "$FD" - | ffmpeg -v error -y -f rawvideo -pix_fmt rgb24 -s 1080x1920 -r 30 -i - -i "$NAR" -map 0:v -map 1:a -af "$PRE,$LN5,alimiter=limit=0.8,apad" -c:v libx264 -preset slow -crf 24 -pix_fmt yuv420p -tune animation -c:a aac -b:a 128k -ar 44100 -movflags +faststart -t 47.3 "$R/output/BB_Labios_Surco_Narracion.mp4"

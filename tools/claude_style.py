@@ -184,6 +184,21 @@ def icon_dual():
     S += [(star_pts(-150, -120, 26), 4), (star_pts(215, -60, 18), 4)]
     return [(blob(-95, 20, 140, 11), CLAY_SOFT), (blob(120, 10, 125, 12), CLAY_SOFT), (fill, CLAY)], S
 
+if os.environ.get("STORY") == "v4":
+    # Versão com a narração gravada (47,3 s) — tempos seguem a fala
+    DUR = 47.3
+    slides = [
+     dict(t0=0.0, t1=2.2, th=LIGHT, title="¿Miedo a\nlas agujas?", icon=icon_syringe),
+     dict(t0=2.2, t1=5.5, th=DARK, kicker="Te presento", title="Hyaluron Pen", sub="Volumen sin agujas.", icon=icon_pen),
+     dict(t0=5.5, t1=16.0, th=LIGHT, title="Una clienta\nde años.", sub="Comenzó conmigo hace unos años.", icon=icon_heart),
+     dict(t0=16.0, t1=37.0, th=LIGHT, ba=True, imgs=("labios2/antes_recorte.png", "labios2/despues_recorte.png"),
+          pw_w=580, ph_h=446, py0=640, d_start=1.6, circle=False, lips_ring=4.2, lips_ring_end=9.3, fold_rings=11.9,
+          note="Resultados reales · Los resultados pueden variar.",
+          phases=[(0.0, "Más volumen.", "Sutil y mucho más natural."), (9.7, "Y el surco\nnasogeniano.", None),
+                  (15.7, "De la nariz a la\ncomisura.", None)]),
+     dict(t0=37.0, t1=40.9, th=LIGHT, title="Sin agujas.", sub="Todo este resultado, sin agujas.", icon=icon_syringe),
+     dict(t0=40.9, t1=DUR, th=LIGHT, end=True),
+    ]
 if os.environ.get("STORY") == "v3":
     # Versão SEM VOZ para regravar o áudio: lábios + surco nasogeniano da mesma cliente (24 s)
     DUR = 24.0
@@ -245,7 +260,7 @@ def build(s, idx):
             d.line(T, fill=th["ink"] + (255,), width=3, joint="curve")
             return card
         s["antes"] = framed(os.path.join(ad, imgs[0]), "Antes"); s["despues"] = framed(os.path.join(ad, imgs[1]), "Después")
-        s["py"] = 600
+        s["py"] = s.get("py0", 600)
         im = Image.new("RGBA", (W, 60), (0, 0, 0, 0)); d = ImageDraw.Draw(im)
         d.text((W / 2, 10), s.get("note", "Imágenes del vídeo original · Los resultados pueden variar."), anchor="ma", font=sans(24, 400), fill=th["gray"] + (255,))
         s["note"] = im; return
