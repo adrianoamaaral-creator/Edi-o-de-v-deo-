@@ -220,7 +220,7 @@ def icon_hourglass():
 if os.environ.get("STORY") == "micro":
     DUR = 32.0
     slides = [
-     dict(t0=0.0, t1=3.8, th=DARK, kicker="Nuevo en BBLips", title="Micropigmentación\nlabial", tsize=86, icon=icon_lips_dots),
+     dict(t0=0.0, t1=3.8, th=DARK, kicker="Nuevo en BBLips", title="Micropigmentación\nlabial", tsize=86, icon=icon_final),
      dict(t0=3.8, t1=8.6, th=LIGHT, title="¿Qué es?", sub="Pigmento en la capa más superficial\nde la piel para dar color, definición\ny vida a tus labios.", icon=icon_lips_dots),
      dict(t0=8.6, t1=13.8, th=LIGHT, title="Beneficios", sub="•  Color uniforme y natural\n•  Contorno más definido\n•  Efecto más jugoso\n•  Te levantas lista", icon=icon_sparkle),
      dict(t0=13.8, t1=19.0, th=LIGHT, title="El proceso", sub="1.  Diseño y color a tu medida\n2.  Anestesia tópica\n3.  Pigmentación, con calma y precisión", icon=icon_heart),
