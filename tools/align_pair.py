@@ -10,7 +10,9 @@ if len(sys.argv) > 5:   # pontos do DEPOIS passados como JSON, ex.: '[[865,610],
     import json; PD = np.float32(json.loads(sys.argv[5]))
 OW, OH, MOUTH = 1160, 892, 560          # tamanho do recorte e largura final da boca (px)
 a = cv2.imread(A); d = cv2.imread(D)
-M, _ = cv2.estimateAffine2D(PA, PD, method=cv2.LMEDS)       # antes -> espaço do depois
+# Só rotação + zoom uniforme + posição (sem esticar/inclinar), para a foto continuar natural.
+# Usa os cantos da boca e o centro dos lábios (os pontos do nariz pesam pouco porque o rosto está virado).
+M, _ = cv2.estimateAffinePartial2D(PA[:4], PD[:4], method=cv2.LMEDS)
 # nivelamento + escala + centralização no espaço do depois
 (lx, ly), (rx, ry) = PD[0], PD[1]
 ang = math.degrees(math.atan2(ry - ly, rx - lx)); k = MOUTH / math.hypot(rx - lx, ry - ly)
@@ -21,5 +23,5 @@ def compose(B, C):  # aplica C depois de B
     B3 = np.vstack([B, [0, 0, 1]]); C3 = np.vstack([C, [0, 0, 1]]); return (C3 @ B3)[:2]
 cv2.imwrite(OD, cv2.warpAffine(d, R, (OW, OH), flags=cv2.INTER_LANCZOS4, borderMode=cv2.BORDER_REFLECT))
 cv2.imwrite(OA, cv2.warpAffine(a, compose(M, R), (OW, OH), flags=cv2.INTER_LANCZOS4, borderMode=cv2.BORDER_REFLECT))
-res = cv2.transform(PA[None], M)[0] - PD
+res = cv2.transform(PA[None, :4], M)[0] - PD[:4]
 print("erro médio do alinhamento (px):", float(np.linalg.norm(res, axis=1).mean()))
