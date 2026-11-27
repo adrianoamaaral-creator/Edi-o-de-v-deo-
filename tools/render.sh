@@ -90,3 +90,13 @@ M8=$(ffmpeg -hide_banner -i "$AW/music.wav" -af loudnorm=I=-16:TP=-1.5:LRA=11:pr
 w8(){ echo "$M8" | python3 -c "import json,sys;print(json.load(sys.stdin)['$1'])"; }
 STORY=hidragloss python3 -I "$R/tools/claude_style.py" "$FD" - | ffmpeg -v error -y -f rawvideo -pix_fmt rgb24 -s 1080x1920 -r 30 -i - -i "$AW/music.wav" -map 0:v -map 1:a -af "loudnorm=I=-16:TP=-1.5:LRA=11:measured_I=$(w8 input_i):measured_TP=$(w8 input_tp):measured_LRA=$(w8 input_lra):measured_thresh=$(w8 input_thresh):offset=$(w8 target_offset):linear=true" -c:v libx264 -preset slow -crf 14 -profile:v high -pix_fmt yuv420p -tune animation -c:a aac -b:a 256k -movflags +faststart -t 30 "$R/output/BB_Hidragloss_HQ.mp4"
 rm -rf "$AW"
+
+# ---- Hidragloss em estilo "motion neon" (modelo enviado), sem pessoa em cena ----
+AW="$(mktemp -d)"
+SFX_OUT="$AW/sfx.json" PREV_TS=999 python3 -I "$R/tools/neon_style.py" "$FD" "$R/assets" - "$AW" >/dev/null
+python3 -I "$R/tools/make_music.py" 35.5 "$AW/music.wav" >/dev/null
+python3 -I "$R/tools/neon_audio.py" "$AW/sfx.json" "$AW/music.wav" "$AW/mix.wav" 35.5
+M9=$(ffmpeg -hide_banner -i "$AW/mix.wav" -af loudnorm=I=-15:TP=-1.5:LRA=11:print_format=json -f null - 2>&1 | sed -n '/^{/,/^}/p')
+w9(){ echo "$M9" | python3 -c "import json,sys;print(json.load(sys.stdin)['$1'])"; }
+python3 -I "$R/tools/neon_style.py" "$FD" "$R/assets" - | ffmpeg -v error -y -f rawvideo -pix_fmt rgb24 -s 1080x1920 -r 30 -i - -i "$AW/mix.wav" -map 0:v -map 1:a -af "loudnorm=I=-15:TP=-1.5:LRA=11:measured_I=$(w9 input_i):measured_TP=$(w9 input_tp):measured_LRA=$(w9 input_lra):measured_thresh=$(w9 input_thresh):offset=$(w9 target_offset):linear=true" -c:v libx264 -preset slow -crf 15 -profile:v high -pix_fmt yuv420p -c:a aac -b:a 256k -movflags +faststart -t 35.5 "$R/output/BB_Hidragloss_Neon_HQ.mp4"
+rm -rf "$AW"
