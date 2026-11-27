@@ -11,6 +11,10 @@ SFX = [  # (tempo, arquivo, ganho dB)
     (37.78, "pop", -18), (38.98, "pop", -18), (40.35, "pop", -18), (41.83, "ding", -16),
 ]
 
+import os
+if os.environ.get("SFX_JSON"):
+    SFX = [tuple(x) for x in json.load(open(os.environ["SFX_JSON"]))]
+
 def run(cmd): return subprocess.run(cmd, check=True, capture_output=True, text=True)
 
 def main():
